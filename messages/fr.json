@@ -1,0 +1,110 @@
+{
+  "Navbar": {
+    "home": "Accueil",
+    "about": "À Propos",
+    "academics": "Académique",
+    "curriculum": "Programme",
+    "campus": "Campus",
+    "admissions": "Admissions",
+    "results": "Résultats",
+    "applyNow": "Postuler"
+  },
+  "Hero": {
+    "title": "Target International School — Désormais en Allemagne",
+    "subtitle": "Excellence éducative depuis 2005",
+    "description": "Une éducation complète axée sur le Business et l'IT, préparant les élèves de la 1ère à la 11ème année aux admissions universitaires mondiales.",
+    "cta": "Commencer"
+  },
+  "Stats": {
+    "students": "Élèves",
+    "branches": "Campus",
+    "acceptances": "Admission universitaire",
+    "years": "Ans d’expérience"
+  },
+  "Academics": {
+    "title": "Rigueur Académique",
+    "description": "Nos programmes de préparation SAT et IELTS obtiennent régulièrement des résultats dans les plus hauts pourcentages mondiaux, garantissant l'admission directe dans les meilleures universités.",
+    "apTutor": "Tuteur AP Officiel",
+    "apTutorDesc": "Enseignement accrédité College Board pour le standard Advanced Placement dans plus de 10 matières.",
+    "satCenter": "Centre SAT Officiel",
+    "satCenterDesc": "Un centre de test reconnu offrant une préparation complète au raisonnement quantitatif et verbal.",
+    "rigor": "Haute Rigueur et Discipline",
+    "rigorDesc": "Nous exigeons l'excellence et favorisons la pensée critique. Notre environnement académique rigoureux pousse les élèves à atteindre leur plein potentiel chaque jour."
+  },
+  "About": {
+    "title": "Former les Leaders de Demain",
+    "subtitle": "Profil de Target International School",
+    "description1": "À Target International School, nous croyons que l'éducation ne se limite pas aux résultats académiques, mais vise le développement de la personne entière — inspirer des leaders confiants et bienveillants qui façonneront un avenir meilleur.",
+    "description2": "Guidés par nos valeurs fondamentales d'Excellence, Innovation, Intégrité, Respect, Responsabilité et Citoyenneté Mondiale, nous créons un environnement où la diversité est valorisée.",
+    "highlightsTitle": "Notre Équipe de Direction",
+    "highlight1": "Bekhzod Jalilov, PDG. Élever les standards mondiaux de l'éducation.",
+    "highlight2": "Javohir Ruziyev, Dir. Marketing. Construire une présence numérique professionnelle.",
+    "highlight3": "Feruza Sotiboldiyeva, Conseillère. Soutien émotionnel et académique pour tous les élèves.",
+    "highlight4": "Naimov Diyorbek, Dir. Formations Académiques. Méthodologie d'enseignement avancée.",
+    "value1Title": "Excellence",
+    "fac1Title": "Laboratoires",
+    "time1": "Inception Tashkent."
+  },
+  "Curriculum": {
+    "title": "Programme Spécialisé",
+    "description": "Profondément axé sur le Business, l'IT et le STEM. Nous proposons des modules académiques rigoureux conçus pour former des leaders mondiaux.",
+    "business": "Business et Finance",
+    "businessDesc": "Littératie financière complète, entrepreneuriat, marketing et études commerciales fondamentales.",
+    "it": "IT Avancé",
+    "itDesc": "Technologies de l'information de pointe — programmation, développement web, architecture système et cybersécurité.",
+    "math": "Mathématiques (SAT)",
+    "mathDesc": "Raisonnement quantitatif intensif et algèbre avancée pour des scores SAT supérieurs à 1400.",
+    "english": "Anglais (IELTS)",
+    "englishDesc": "Maîtrise de la langue anglaise avec préparation rigoureuse à l'IELTS ciblant Band 7.0+.",
+    "ap": "AP et A-Levels",
+    "apDesc": "Cours Advanced Placement accrédités College Board et parcours A-Level pour les admissions universitaires mondiales.",
+    "logic": "Logique et Pensée Critique",
+    "logicDesc": "Un cours fondamental développant des compétences analytiques profondes et une analyse systématique.",
+    "sport": "Sports et Athlétisme",
+    "sportDesc": "Programmes sportifs complets incluant football, basketball et fitness — développer l'élève dans sa globalité."
+  },
+  "Results": {
+    "title": "Résultats Académiques Exceptionnels",
+    "description": "Nos élèves obtiennent régulièrement des places dans les universités les plus prestigieuses des USA, d'Europe et d'Asie.",
+    "ivy": "Harvard, Stanford, MIT",
+    "ivyDesc": "Admissions régulières dans les meilleures institutions Ivy League et universités tech américaines.",
+    "europe": "Oxford et Cambridge",
+    "europeDesc": "Places dans les meilleures institutions britanniques, ainsi qu'ETH Zurich et la Sorbonne.",
+    "asia": "NUS et Tokyo",
+    "asiaDesc": "Placements dominants dans les meilleures universités asiatiques et australiennes.",
+    "achievements": "Galerie des Réussites",
+    "wsc": "World Scholars Cup",
+    "wscDesc": "Médailles d'or et d'argent, 1ère place dans la section débat internationale.",
+    "mathAsian": "Arithmétique Mentale ASIAN CUP",
+    "mathAsianDesc": "6 or, 8 argent, 7 bronze à l'olympiade internationale.",
+    "robotics": "Robotique Nationale",
+    "roboticsDesc": "Or, argent et bronze au Championnat National de Robotique.",
+    "techAward": "Prix Tech Présidentiel",
+    "techAwardDesc": "2ème place nationale avec le projet innovant 'Speaklish'.",
+    "wamas": "WAMAS 2024",
+    "wamasDesc": "L'élève Zulayho a reçu le Trophée d'Or parmi 500+ participants de 24 pays."
+  },
+  "Campus": {
+    "title": "Notre Réseau Mondial",
+    "description": "Laboratoires informatiques de pointe, centres d'innovation business et installations modernes sur cinq campus dans deux pays.",
+    "germany": "Campus Allemagne",
+    "germanyDesc": "Le nouveau campus phare européen — ouvrir les portes aux étudiants de toute l'Europe.",
+    "istirohat": "Campus Istirohat",
+    "istirohatDesc": "Centre d'Innovation STEM — notre hub pour la science, la technologie et la recherche.",
+    "tinchlik": "Campus Tinchlik",
+    "tinchlikDesc": "Laboratoires Business et IT — espace dédié à l'éducation technologique pratique.",
+    "yunusabad": "Campus Yunusabad",
+    "yunusabadDesc": "Centre d'Excellence Académique — préparation spécialisée SAT et IELTS.",
+    "sergeli": "Campus Sergeli",
+    "sergeliDesc": "Complexe Sportif d'Élite — gymnase, terrain de football et centre de fitness."
+  },
+  "Footer": {
+    "aboutText": "Target International School s'engage à fournir une éducation transformative axée sur le Business et l'IT, permettant aux élèves de devenir des leaders mondiaux.",
+    "quickLinks": "Explorer",
+    "contactUs": "Contact",
+    "rights": "Tous droits réservés. Target International School.",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions d'utilisation",
+    "address": "Campus de Berlin, Allemagne"
+  }
+}
