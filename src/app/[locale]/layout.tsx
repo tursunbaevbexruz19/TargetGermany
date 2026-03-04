@@ -28,8 +28,8 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
-      <body className={`${inter.className} bg-slate-900 text-white min-h-screen antialiased`}>
+    <html lang={locale} suppressHydrationWarning>
+      <body className={`${inter.className} bg-[#0a0f1e] text-white min-h-screen antialiased`}>
         <NextIntlClientProvider messages={messages}>
           {children}
         </NextIntlClientProvider>
