@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { motion, useMotionTemplate, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Calculator, FlaskConical, Globe2, BookOpenCheck } from "lucide-react";
 import React, { useRef } from "react";
 
@@ -77,6 +77,7 @@ export default function Courses() {
     );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function CourseCard({ course, index }: { course: any, index: number }) {
     const ref = useRef<HTMLDivElement>(null);
     const x = useMotionValue(0);
@@ -141,3 +142,4 @@ function CourseCard({ course, index }: { course: any, index: number }) {
         </motion.div>
     );
 }
+

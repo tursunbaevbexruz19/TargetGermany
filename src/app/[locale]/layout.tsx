@@ -1,39 +1,38 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "../globals.css";
-import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
-import { notFound } from 'next/navigation';
-import { routing } from '@/i18n/routing';
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+import { notFound } from "next/navigation";
+import { routing } from "@/i18n/routing";
 
-const inter = Inter({ subsets: ["latin"] });
+const isValidLocale = (value: string): value is (typeof routing.locales)[number] =>
+    routing.locales.includes(value as (typeof routing.locales)[number]);
 
 export const metadata: Metadata = {
-  title: "Target International School",
-  description: "Target International School German Branch - Excellence in Education. Creating future leaders.",
+    title: "Target International School",
+    description: "Target International School German Branch - Excellence in Education. Creating future leaders.",
 };
 
 export default async function RootLayout({
-  children,
-  params
+    children,
+    params,
 }: Readonly<{
-  children: React.ReactNode;
-  params: Promise<{ locale: string }>;
+    children: React.ReactNode;
+    params: Promise<{ locale: string }>;
 }>) {
-  const { locale } = await params;
-  if (!routing.locales.includes(locale as any)) {
-    notFound();
-  }
+    const { locale } = await params;
 
-  const messages = await getMessages();
+    if (!isValidLocale(locale)) {
+        notFound();
+    }
 
-  return (
-    <html lang={locale} suppressHydrationWarning>
-      <body className={`${inter.className} bg-[#0a0f1e] text-white min-h-screen antialiased`}>
-        <NextIntlClientProvider messages={messages}>
-          {children}
-        </NextIntlClientProvider>
-      </body>
-    </html>
-  );
+    const messages = await getMessages();
+
+    return (
+        <html lang={locale} suppressHydrationWarning>
+            <body className="min-h-screen bg-[#0a0f1e] font-[family-name:var(--font-inter)] text-white antialiased">
+                <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+            </body>
+        </html>
+    );
 }

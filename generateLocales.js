@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs');
 const path = require('path');
 
@@ -181,3 +182,4 @@ for (const [lang, data] of Object.entries(locales)) {
     fs.writeFileSync(path.join(dir, `${lang}.json`), JSON.stringify(data, null, 2));
 }
 console.log('Massive Locales generated successfully.');
+

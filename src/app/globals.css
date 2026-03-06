@@ -4,6 +4,9 @@
   --background: #0a0f1e;
   --foreground: #ffffff;
   --accent: #ef4444;
+  --accent-glow: rgba(239, 68, 68, 0.15);
+  --font-inter: "Inter", "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-outfit: "Outfit", "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
 }
 
 @theme inline {
@@ -14,6 +17,9 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+  scrollbar-gutter: stable;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -22,15 +28,50 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01", "ss02", "cv01";
+  overflow-x: hidden;
 }
 
-/* Brand-consistent selection */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.014;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  mix-blend-mode: overlay;
+}
+
 ::selection {
   background-color: rgba(239, 68, 68, 0.25);
   color: white;
 }
 
-/* Scrollbar hiding utility */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(239, 68, 68, 0.2);
+  border-radius: 99px;
+  transition: background 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(239, 68, 68, 0.4);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(239, 68, 68, 0.2) transparent;
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -40,26 +81,26 @@ body {
   scrollbar-width: none;
 }
 
-/* Global smooth transitions for interactive elements */
 button,
 a,
 input,
 select,
 textarea {
   transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  transition-duration: 0.3s;
 }
 
-/* GPU compositing hint for animated elements */
-[data-framer-appear],
-[style*="transform"] {
-  will-change: transform, opacity;
-  backface-visibility: hidden;
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15), 0 0 20px rgba(239, 68, 68, 0.08);
 }
 
-/* Smoother section entry on scroll — content-visibility offloads off-screen rendering */
-section {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 800px;
+@media (min-width: 769px) {
+  [data-framer-appear] {
+    will-change: opacity;
+  }
 }
 
 @keyframes shimmer {
@@ -69,5 +110,120 @@ section {
 
   100% {
     transform: translateX(200%) skewX(-20deg);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+
+  50% {
+    opacity: 0.35;
+    transform: translateY(-25px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
+  }
+
+  50% {
+    box-shadow: 0 0 40px rgba(239, 68, 68, 0.35), 0 0 80px rgba(239, 68, 68, 0.1);
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0px);
+  }
+}
+
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient-text {
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+}
+
+.floating-label-input {
+  position: relative;
+}
+
+.floating-label-input label {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.floating-label-input input:focus~label,
+.floating-label-input input:not(:placeholder-shown)~label,
+.floating-label-input textarea:focus~label,
+.floating-label-input textarea:not(:placeholder-shown)~label,
+.floating-label-input select:focus~label,
+.floating-label-input select:valid~label {
+  top: -10px;
+  left: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(239, 68, 68, 0.6);
+  background: var(--background);
+  padding: 0 6px;
+}
+
+@media (max-width: 768px) {
+  html {
+    scroll-padding-top: 88px;
+  }
+
+  body::after {
+    opacity: 0.008;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  body::after {
+    opacity: 0.004;
   }
 }

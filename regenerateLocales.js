@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs');
 const path = require('path');
 
@@ -44,7 +45,7 @@ for (const locale of localeFiles) {
     let existing = {};
     try {
         existing = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-    } catch (e) {
+    } catch {
         // File doesn't exist or is invalid, start fresh
     }
 
@@ -60,3 +61,4 @@ for (const locale of localeFiles) {
 }
 
 console.log(`\nDone! All locales synced with en.json structure (${enKeys.length} keys)`);
+

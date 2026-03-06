@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, useMotionTemplate } from "framer-motion";
 import { useEffect, useState, useRef } from "react";
 import { Users, Building2, GraduationCap, Award } from "lucide-react";
 
@@ -68,9 +68,23 @@ function TiltCard({ children }: { children: React.ReactNode }) {
     );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function StatCard({ stat, index }: { stat: any; index: number }) {
     const [count, setCount] = useState(0);
     const cardRef = useRef<HTMLDivElement>(null);
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        const { left, top } = e.currentTarget.getBoundingClientRect();
+        mouseX.set(e.clientX - left);
+        mouseY.set(e.clientY - top);
+    };
+
+    const handleMouseLeave = () => {
+        mouseX.set(0);
+        mouseY.set(0);
+    };
 
     useEffect(() => {
         let startTime: number | null = null;
@@ -114,20 +128,38 @@ function StatCard({ stat, index }: { stat: any; index: number }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: index * 0.1, ease: "easeOut" }}
-            className="flex flex-col items-center justify-center py-8 px-4 md:py-12 md:px-6 rounded-2xl md:rounded-3xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.06] hover:border-white/10 transition-all duration-500 group-hover:shadow-[0_10px_30px_rgba(0,0,0,0.3)]"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            className="group relative flex flex-col items-center justify-center py-8 px-4 md:py-12 md:px-6 rounded-2xl md:rounded-3xl bg-white/[0.03] border border-white/[0.06] hover:bg-[#0a0f1e] hover:border-red-500/20 transition-all duration-500 hover:shadow-[0_10px_30px_rgba(239,68,68,0.15)] overflow-hidden"
         >
-            <div className="mb-4 md:mb-6 p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/[0.06]">
-                <stat.icon className="w-6 h-6 md:w-8 md:h-8 text-white/60" />
-            </div>
+            <motion.div
+                className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100 mix-blend-screen"
+                style={{
+                    background: useMotionTemplate`
+                        radial-gradient(
+                            300px circle at ${mouseX}px ${mouseY}px,
+                            rgba(239, 68, 68, 0.15),
+                            transparent 80%
+                        )
+                    `
+                }}
+            />
 
-            <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter mb-2 md:mb-3 flex items-baseline justify-center tabular-nums">
-                {count.toLocaleString()}
-                <span className="text-white/40 text-xl sm:text-2xl md:text-3xl ml-0.5">{stat.suffix}</span>
-            </div>
+            <div className="relative z-10 flex flex-col items-center pointer-events-none">
+                <div className="mb-4 md:mb-6 p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/5 border border-white/[0.06] group-hover:bg-red-500/10 group-hover:border-red-500/20 group-hover:scale-110 transition-all duration-300 pointer-events-auto">
+                    <stat.icon className="w-6 h-6 md:w-8 md:h-8 text-white/60 group-hover:text-red-400 transition-colors" />
+                </div>
 
-            <div className="text-[10px] sm:text-xs md:text-sm text-white/40 font-semibold uppercase tracking-[0.15em] md:tracking-[0.2em] text-center leading-tight">
-                {stat.name}
+                <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white tracking-tighter mb-2 md:mb-3 flex items-baseline justify-center tabular-nums group-hover:text-red-400 transition-colors">
+                    {count.toLocaleString()}
+                    <span className="text-white/40 text-xl sm:text-2xl md:text-3xl ml-0.5">{stat.suffix}</span>
+                </div>
+
+                <div className="text-[10px] sm:text-xs md:text-sm text-white/40 font-semibold uppercase tracking-[0.15em] md:tracking-[0.2em] text-center leading-tight">
+                    {stat.name}
+                </div>
             </div>
         </motion.div>
     );
 }
+

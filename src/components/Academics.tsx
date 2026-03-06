@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { motion, type Variants } from "framer-motion";
+import { motion, type Variants, useMotionValue, useMotionTemplate } from "framer-motion";
 import { GraduationCap, Award, BookCheck, BarChart3, Trophy, Globe2, BookOpen } from "lucide-react";
 import React from "react";
 
@@ -122,27 +122,7 @@ export default function Academics() {
             <section className="py-24 px-6 md:px-16 relative z-10">
                 <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
                     {programs.map((program, i) => (
-                        <motion.div
-                            key={i}
-                            custom={i}
-                            variants={fadeUp}
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true }}
-                            className={`group relative p-10 md:p-14 rounded-[2.5rem] border ${program.border} bg-gradient-to-br ${program.color} backdrop-blur-sm overflow-hidden hover:scale-[1.02] transition-transform duration-500`}
-                        >
-                            <div className={`absolute -top-32 -right-32 w-64 h-64 rounded-full blur-[80px] ${program.glow} opacity-50 group-hover:opacity-100 transition-opacity duration-700`} />
-
-                            <div className="relative z-10">
-                                <div className={`w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-8 shadow-inner group-hover:bg-white/10 transition-colors`}>
-                                    <program.icon className={`w-8 h-8 ${program.accent}`} />
-                                </div>
-                                <p className="text-xs uppercase tracking-[0.3em] text-white/40 font-bold mb-3">{program.stats}</p>
-                                <h3 className={`text-3xl md:text-4xl font-black ${program.accent} mb-4 tracking-tight`}>{program.title}</h3>
-                                <p className="text-xl text-white/80 font-medium leading-relaxed mb-6">{program.desc}</p>
-                                <p className="text-base text-white/40 leading-relaxed font-light">{program.detail}</p>
-                            </div>
-                        </motion.div>
+                        <PillarCard key={i} program={program} i={i} />
                     ))}
                 </div>
             </section>
@@ -258,3 +238,67 @@ export default function Academics() {
         </motion.div>
     );
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function PillarCard({ program, i }: { program: any, i: number }) {
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+
+    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        const { left, top } = e.currentTarget.getBoundingClientRect();
+        mouseX.set(e.clientX - left);
+        mouseY.set(e.clientY - top);
+    };
+
+    const handleMouseLeave = () => {
+        mouseX.set(0);
+        mouseY.set(0);
+    };
+
+    // Extract color variable purely for the glow ring
+    const glowBaseColor = program.accent.includes('rose') ? 'rgba(244, 63, 94, 0.4)' :
+        program.accent.includes('indigo') ? 'rgba(99, 102, 241, 0.4)' :
+            program.accent.includes('emerald') ? 'rgba(16, 185, 129, 0.4)' :
+                'rgba(245, 158, 11, 0.4)';
+
+    return (
+        <motion.div
+            custom={i}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            className={`group relative p-10 md:p-14 rounded-[2.5rem] border ${program.border} bg-gradient-to-br ${program.color} backdrop-blur-sm overflow-hidden hover:scale-[1.02] transition-transform duration-500 shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.25)]`}
+        >
+            {/* Base static glow */}
+            <div className={`absolute -top-32 -right-32 w-64 h-64 rounded-full blur-[80px] ${program.glow} opacity-30 transition-opacity duration-700`} />
+
+            {/* Interactive moving spotlight */}
+            <motion.div
+                className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100 mix-blend-screen"
+                style={{
+                    background: useMotionTemplate`
+                        radial-gradient(
+                            500px circle at ${mouseX}px ${mouseY}px,
+                            ${glowBaseColor},
+                            transparent 70%
+                        )
+                    `
+                }}
+            />
+
+            <div className="relative z-10 pointer-events-none">
+                <div className={`w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mb-8 shadow-inner group-hover:bg-white/10 transition-colors pointer-events-auto`}>
+                    <program.icon className={`w-8 h-8 ${program.accent}`} />
+                </div>
+                <p className="text-xs uppercase tracking-[0.3em] text-white/50 font-bold mb-3">{program.stats}</p>
+                <h3 className={`text-3xl md:text-4xl font-black ${program.accent} mb-4 tracking-tight`}>{program.title}</h3>
+                <p className="text-xl text-white/80 font-medium leading-relaxed mb-6">{program.desc}</p>
+                <p className="text-base text-white/40 leading-relaxed font-light">{program.detail}</p>
+            </div>
+        </motion.div>
+    );
+}
+

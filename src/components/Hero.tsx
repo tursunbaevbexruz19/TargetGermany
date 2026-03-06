@@ -1,228 +1,463 @@
 "use client";
 
-import { useRef, useEffect, useState, useCallback, memo } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { motion, useScroll, useTransform, useSpring, useMotionValue, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import Image from "next/image";
+import { ArrowRight, BookOpen, CheckCircle2, GraduationCap, MapPin } from "lucide-react";
 
-/* ── Ambient floating particles (pure CSS animation — zero JS overhead) ── */
-const ParticleField = memo(function ParticleField() {
-    const [dots, setDots] = useState<Array<{ x: number; y: number; s: number; d: number; dl: number }>>([]);
-    useEffect(() => {
-        setDots(Array.from({ length: 14 }, () => ({
-            x: Math.random() * 100, y: Math.random() * 100,
-            s: 1 + Math.random() * 2.5, d: 10 + Math.random() * 14, dl: Math.random() * 6,
-        })));
-    }, []);
+const ENTRY_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const PROGRAM_FALLBACKS = ["Foundation Year", "German Language", "University Pathway"];
+const TRUST_FALLBACKS = [
+    "Official AP Tutor",
+    "Certified SAT Center",
+    "College Board Accredited",
+    "CEFR-Aligned German Academy",
+];
+
+function splitList(value: string, fallback: string[]) {
+    const items = value
+        .split("·")
+        .map((item) => item.trim())
+        .filter(Boolean);
+
+    return items.length > 0 ? items : fallback;
+}
+
+const CinematicOrbLayer = memo(function CinematicOrbLayer({ reduceMotion }: { reduceMotion: boolean }) {
     return (
-        <div className="absolute inset-0 z-10 pointer-events-none overflow-hidden" aria-hidden="true">
-            {dots.map((p, i) => (
-                <div key={i} className="absolute rounded-full bg-red-400/[0.12] animate-float"
-                    style={{
-                        width: p.s, height: p.s, left: `${p.x}%`, top: `${p.y}%`,
-                        animationDuration: `${p.d}s`, animationDelay: `${p.dl}s`,
-                    }}
-                />
-            ))}
-            <style jsx>{`
-                @keyframes float { 0%, 100% { opacity: 0; transform: translateY(0); } 50% { opacity: 0.35; transform: translateY(-25px); } }
-                .animate-float { animation: float ease-in-out infinite; }
-            `}</style>
+        <div className="pointer-events-none absolute inset-0 z-10 overflow-hidden" aria-hidden="true">
+            <motion.div
+                className="absolute left-[10%] top-[10%] h-[60vw] w-[60vw] rounded-full bg-[#8c1c1c]/[0.16] blur-[96px] mix-blend-screen md:h-[45vw] md:w-[45vw] md:blur-[128px]"
+                animate={
+                    reduceMotion
+                        ? { opacity: 0.48, scale: 1 }
+                        : {
+                              x: ["0%", "10%", "-4%", "0%"],
+                              y: ["0%", "8%", "14%", "0%"],
+                              scale: [1, 1.08, 0.94, 1],
+                              opacity: [0.48, 0.72, 0.42, 0.48],
+                          }
+                }
+                transition={reduceMotion ? { duration: 0.2 } : { duration: 26, repeat: Infinity, ease: "linear" }}
+            />
+            <motion.div
+                className="absolute bottom-[10%] right-[10%] h-[50vw] w-[50vw] rounded-full bg-[#0a1f44]/[0.22] blur-[76px] mix-blend-screen md:h-[35vw] md:w-[35vw] md:blur-[116px]"
+                animate={
+                    reduceMotion
+                        ? { opacity: 0.42, scale: 1 }
+                        : {
+                              x: ["0%", "-10%", "8%", "0%"],
+                              y: ["0%", "-8%", "-12%", "0%"],
+                              scale: [0.94, 1.1, 0.97, 0.94],
+                              opacity: [0.4, 0.6, 0.34, 0.4],
+                          }
+                }
+                transition={reduceMotion ? { duration: 0.2 } : { duration: 30, repeat: Infinity, ease: "linear" }}
+            />
+            <div className="absolute inset-0 opacity-[0.06] mix-blend-overlay [background-image:radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.18)_1px,transparent_0)] [background-size:24px_24px] [mask-image:radial-gradient(circle_at_center,black,transparent_78%)]" />
         </div>
     );
 });
 
-/* ── Animated counter with intersection observer ── */
 function AnimatedNumber({ target, suffix = "" }: { target: number; suffix?: string }) {
     const [count, setCount] = useState(0);
     const [started, setStarted] = useState(false);
     const ref = useRef<HTMLSpanElement>(null);
 
     useEffect(() => {
-        const el = ref.current;
-        if (!el) return;
-        const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setStarted(true); obs.disconnect(); } }, { threshold: 0.3 });
-        obs.observe(el);
-        return () => obs.disconnect();
+        const element = ref.current;
+        if (!element) return;
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setStarted(true);
+                    observer.disconnect();
+                }
+            },
+            { threshold: 0.45 }
+        );
+
+        observer.observe(element);
+        return () => observer.disconnect();
     }, []);
 
     useEffect(() => {
         if (!started) return;
-        let frame: number;
-        const start = performance.now();
-        const dur = 2000;
+
+        let frame = 0;
+        const startedAt = performance.now();
+        const duration = 1800;
+
         const animate = (now: number) => {
-            const p = Math.min((now - start) / dur, 1);
-            const eased = 1 - Math.pow(1 - p, 3);
+            const progress = Math.min((now - startedAt) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
             setCount(Math.floor(eased * target));
-            if (p < 1) frame = requestAnimationFrame(animate);
+
+            if (progress < 1) {
+                frame = requestAnimationFrame(animate);
+            }
         };
+
         frame = requestAnimationFrame(animate);
         return () => cancelAnimationFrame(frame);
     }, [started, target]);
 
-    return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
+    return (
+        <span ref={ref}>
+            {count.toLocaleString()}
+            {suffix}
+        </span>
+    );
 }
 
-/* ── Stat card with hover glow ── */
 function StatCard({ target, suffix, label, delay }: { target: number; suffix: string; label: string; delay: number }) {
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
-            whileHover={{ y: -4, scale: 1.03 }}
-            className="group relative text-center px-5 py-4 rounded-2xl border border-white/[0.05] bg-white/[0.02] backdrop-blur-sm hover:border-red-500/20 hover:bg-red-500/[0.04] transition-all duration-500 cursor-default"
+            transition={{ duration: 0.7, delay, ease: ENTRY_EASE }}
+            whileHover={{ y: -4, borderColor: "rgba(248, 113, 113, 0.26)" }}
+            className="group relative overflow-hidden rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(7,13,25,0.82),rgba(7,12,22,0.66))] px-5 py-5 shadow-[0_18px_40px_rgba(2,6,23,0.24)] backdrop-blur-md"
         >
-            <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-red-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06),rgba(255,255,255,0))]" />
             <div className="relative z-10">
-                <div className="text-2xl md:text-3xl font-black text-white tabular-nums tracking-tight">
+                <div className="text-3xl font-black tracking-[-0.04em] text-white">
                     <AnimatedNumber target={target} suffix={suffix} />
                 </div>
-                <div className="text-[9px] md:text-[10px] text-white/25 uppercase tracking-[0.18em] font-semibold mt-1.5 group-hover:text-white/40 transition-colors">{label}</div>
+                <div className="mt-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/45 transition-colors group-hover:text-white/70">
+                    {label}
+                </div>
             </div>
         </motion.div>
     );
 }
 
-export default function Hero() {
+/* ── Interactive Roadmap Component ── */
+function InteractiveRoadmap() {
+    const [activeStep, setActiveStep] = useState<number | null>(null);
+
+    const steps = [
+        { id: 1, title: "Language Mastery", desc: "Achieve C1 proficiency with native German educators in just 8-10 months.", icon: BookOpen },
+        { id: 2, title: "University Prep", desc: "Pass the Studienkolleg entrance exam or directly apply with our advanced foundation courses.", icon: GraduationCap },
+        { id: 3, title: "Arrival in Germany", desc: "Get full support with visa, local accommodation, and official university enrollment.", icon: MapPin },
+        { id: 4, title: "Academic Success", desc: "Join 12,000+ Target alumni studying in Germany's tuition-free universities.", icon: CheckCircle2 }
+    ];
+
+    return (
+        <div className="w-full max-w-4xl mx-auto mt-20 mb-8 relative z-40">
+            <h3 className="text-white/60 text-[11px] font-bold uppercase tracking-[0.2em] text-center mb-8">Your Journey to Germany</h3>
+
+            <div className="relative">
+                {/* Connecting Line */}
+                <div className="absolute top-6 left-[10%] right-[10%] h-[2px] bg-white/[0.05] hidden md:block" />
+
+                <div className="flex flex-col md:flex-row justify-between gap-6 md:gap-0 relative z-10">
+                    {steps.map((step, idx) => {
+                        const isActive = activeStep === idx;
+                        return (
+                            <div
+                                key={step.id}
+                                className="flex flex-col items-center relative group cursor-pointer"
+                                onClick={() => setActiveStep(isActive ? null : idx)}
+                                onMouseEnter={() => setActiveStep(idx)}
+                                onMouseLeave={() => setActiveStep(null)}
+                            >
+                                <motion.div
+                                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 relative z-10 
+                                        ${isActive ? "bg-red-500 shadow-[0_0_30px_rgba(239,68,68,0.5)] scale-110" : "bg-[#0a0f1e] border-2 border-white/[0.1] group-hover:border-red-500/50"}`}
+                                >
+                                    <step.icon className={`w-5 h-5 ${isActive ? "text-white" : "text-white/40 group-hover:text-red-400"}`} />
+                                </motion.div>
+
+                                <div className="mt-4 text-center">
+                                    <h4 className={`text-sm md:text-base font-bold transition-colors ${isActive ? "text-white" : "text-white/60"}`}>
+                                        {step.title}
+                                    </h4>
+                                </div>
+
+                                <AnimatePresence>
+                                    {isActive && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                                            className="absolute md:-bottom-24 md:left-1/2 md:-translate-x-1/2 mt-4 md:mt-0 w-[240px] p-4 rounded-xl bg-[linear-gradient(180deg,rgba(7,13,25,0.9),rgba(7,12,22,0.8))] border border-white/[0.08] backdrop-blur-xl z-50 shadow-[0_24px_60px_rgba(2,6,23,0.5)] pointer-events-none"
+                                        >
+                                            <p className="text-xs text-white/60 leading-relaxed text-center">{step.desc}</p>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default function Hero({ setActiveTab }: { setActiveTab?: (tab: string) => void }) {
     const t = useTranslations("Hero");
+    const navT = useTranslations("Navbar");
     const containerRef = useRef<HTMLDivElement>(null);
     const { scrollY } = useScroll();
+    const [activePillar, setActivePillar] = useState(0);
+    const reduceMotion = useReducedMotion() ?? false;
 
-    /* Parallax + fade on scroll */
-    const bgY = useTransform(scrollY, [0, 800], ["0%", "18%"]);
-    const contentOpacity = useTransform(scrollY, [0, 350], [1, 0]);
-    const contentScale = useTransform(scrollY, [0, 350], [1, 0.97]);
+    const bgY = useTransform(scrollY, [0, 900], reduceMotion ? ["0%", "0%"] : ["0%", "10%"]);
+    const contentOpacity = useTransform(scrollY, [0, 320], [1, 0.72]);
+    const contentScale = useTransform(scrollY, [0, 320], [1, 0.992]);
 
-    /* 3D tilt on mouse move */
     const mx = useMotionValue(0);
     const my = useMotionValue(0);
-    const spring = { damping: 35, stiffness: 70 };
-    const rx = useSpring(useTransform(my, [-0.5, 0.5], [1.2, -1.2]), spring);
-    const ry = useSpring(useTransform(mx, [-0.5, 0.5], [-1.2, 1.2]), spring);
+    const spring = { damping: 32, stiffness: 88 };
+    const rx = useSpring(useTransform(my, [-0.5, 0.5], reduceMotion ? [0, 0] : [0.65, -0.65]), spring);
+    const ry = useSpring(useTransform(mx, [-0.5, 0.5], reduceMotion ? [0, 0] : [-0.8, 0.8]), spring);
 
-    const onMove = useCallback((e: React.MouseEvent<HTMLElement>) => {
-        const r = containerRef.current?.getBoundingClientRect();
-        if (!r) return;
-        mx.set((e.clientX - r.left) / r.width - 0.5);
-        my.set((e.clientY - r.top) / r.height - 0.5);
+    const programItems = splitList(t("subtitle"), PROGRAM_FALLBACKS);
+    const trustItems = splitList(t("trustLine"), TRUST_FALLBACKS);
+    const languageTrust =
+        trustItems.find((item) => /cefr|german/i.test(item)) ?? trustItems[trustItems.length - 1] ?? TRUST_FALLBACKS[3];
+
+    const pillars = [
+        {
+            title: programItems[0] ?? PROGRAM_FALLBACKS[0],
+            kicker: navT("admissions"),
+            value: "95%",
+            detail: t("stat2Label"),
+            icon: GraduationCap,
+        },
+        {
+            title: programItems[1] ?? PROGRAM_FALLBACKS[1],
+            kicker: navT("german"),
+            value: "A1-C2",
+            detail: languageTrust,
+            icon: BookOpen,
+        },
+        {
+            title: programItems[2] ?? PROGRAM_FALLBACKS[2],
+            kicker: navT("opportunities"),
+            value: "40+",
+            detail: t("stat3Label"),
+            icon: CheckCircle2,
+        },
+    ];
+
+    const activeItem = pillars[activePillar] ?? pillars[0];
+    const ActiveIcon = activeItem.icon;
+
+    const onMove = useCallback(
+        (event: React.MouseEvent<HTMLElement>) => {
+            if (reduceMotion) return;
+
+            const bounds = containerRef.current?.getBoundingClientRect();
+            if (!bounds) return;
+
+            mx.set((event.clientX - bounds.left) / bounds.width - 0.5);
+            my.set((event.clientY - bounds.top) / bounds.height - 0.5);
+        },
+        [mx, my, reduceMotion]
+    );
+
+    const onLeave = useCallback(() => {
+        mx.set(0);
+        my.set(0);
     }, [mx, my]);
 
-    const onLeave = useCallback(() => { mx.set(0); my.set(0); }, [mx, my]);
-
-    /* Smooth stagger utility */
     const fadeUp = (delay: number) => ({
         initial: { opacity: 0, y: 22 },
         animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] },
+        transition: { duration: 0.8, delay, ease: ENTRY_EASE },
     });
+
+    const changeTab = (tab: string) => {
+        if (setActiveTab) {
+            setActiveTab(tab);
+        }
+
+        window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+    };
 
     return (
         <section
             ref={containerRef}
             onMouseMove={onMove}
             onMouseLeave={onLeave}
-            className="relative h-[100svh] w-full flex items-center justify-center overflow-hidden [perspective:1200px]"
+            className="relative min-h-[100svh] w-full overflow-hidden [perspective:1200px]"
         >
-            {/* Background with parallax + 3D tilt */}
-            <motion.div className="absolute inset-0 z-0 h-[120%] w-[106%] -left-[3%] -top-[6%] will-change-transform" style={{ y: bgY }}>
-                <motion.div className="w-full h-full relative" style={{ rotateX: rx as any, rotateY: ry as any }}>
-                    <Image src="/Germany-Berlin.jpg" alt="Berlin, Germany" fill className="object-cover object-center" priority quality={85} sizes="100vw" />
-                    {/* Multi-layer gradient overlay for depth */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f1e] via-[#0a0f1e]/60 to-[#0a0f1e]/20" />
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,#0a0f1e_100%)]" />
+            <motion.div className="absolute inset-0 z-0 h-[114%] w-[106%] -left-[3%] -top-[5%] will-change-transform" style={{ y: bgY }}>
+                <motion.div className="relative h-full w-full" style={{ rotateX: rx, rotateY: ry }}>
+                    <Image
+                        src="/Germany-Berlin.jpg"
+                        alt="Berlin, Germany"
+                        fill
+                        priority
+                        quality={84}
+                        sizes="100vw"
+                        className="object-cover object-center"
+                    />
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(2,6,18,0.88)_0%,rgba(4,10,23,0.54)_24%,rgba(5,11,22,0.3)_52%,rgba(2,6,18,0.84)_100%)]" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(17,39,78,0.36),transparent_40%),radial-gradient(circle_at_bottom,rgba(0,0,0,0.48),transparent_38%),radial-gradient(circle_at_left,rgba(0,0,0,0.32),transparent_44%)]" />
                 </motion.div>
             </motion.div>
 
-            <ParticleField />
+            <div className="pointer-events-none absolute inset-x-0 top-0 z-20 h-48 bg-gradient-to-b from-[#020611] via-[#020611]/78 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-[28%] bg-gradient-to-t from-[#040814] via-[#040814]/70 to-transparent" />
+            <CinematicOrbLayer reduceMotion={reduceMotion} />
 
-            {/* ─── Main content ─── */}
             <motion.div
-                className="relative z-30 w-full max-w-5xl mx-auto px-5 sm:px-8 flex flex-col items-center text-center"
-                style={{ opacity: contentOpacity, scale: contentScale, rotateX: rx as any, rotateY: ry as any, transformStyle: "preserve-3d" }}
+                className="relative z-30 mx-auto flex min-h-[100svh] w-full max-w-6xl flex-col items-center justify-center px-5 pb-10 pt-24 text-center sm:px-8 sm:pb-12 sm:pt-32 lg:px-10"
+                style={{ opacity: contentOpacity, scale: contentScale }}
             >
-                {/* Logo mark */}
-                <motion.div {...fadeUp(0.15)} className="mb-6">
-                    <div className="relative w-12 h-12 md:w-16 md:h-16 mx-auto">
-                        <Image src="/logo-white.png" alt="Target" fill className="object-contain drop-shadow-[0_0_25px_rgba(220,38,38,0.2)]" priority />
-                    </div>
-                </motion.div>
-
-                {/* Live intake badge */}
-                <motion.div {...fadeUp(0.35)} className="mb-8">
-                    <div className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full border border-red-500/15 bg-red-500/[0.06] backdrop-blur-xl">
-                        <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inset-0 rounded-full bg-red-500 opacity-50" />
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                <motion.div {...fadeUp(0.08)} className="flex justify-center">
+                    <div className="inline-flex max-w-full flex-wrap items-center gap-2.5 rounded-full border border-red-400/18 bg-[#0c1730]/68 px-4 py-2.5 shadow-[0_12px_30px_rgba(2,6,20,0.2)] backdrop-blur-xl sm:px-5">
+                        <span className="relative flex h-2.5 w-2.5">
+                            <span className="absolute inset-0 animate-ping rounded-full bg-red-400 opacity-55" />
+                            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-400 shadow-[0_0_14px_rgba(248,113,113,0.85)]" />
                         </span>
-                        <span className="text-[11px] md:text-xs font-semibold tracking-[0.12em] uppercase text-red-200/70">{t("badge")}</span>
+                        <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-red-100/88 sm:text-xs">
+                            {t("badge")}
+                        </span>
                     </div>
                 </motion.div>
 
-                {/* Headline — clean, bold, impactful */}
-                <motion.h1 {...fadeUp(0.55)} className="mb-5">
-                    <span className="block text-[2.2rem] leading-[1.05] sm:text-[3rem] md:text-[4rem] lg:text-[5rem] font-black tracking-[-0.035em] text-white">
+                <motion.h1 {...fadeUp(0.18)} className="mt-6 max-w-5xl text-balance">
+                    <span className="block font-[family-name:var(--font-outfit)] text-[2.95rem] font-black leading-[0.94] tracking-[-0.05em] text-white sm:text-[4.1rem] md:text-[5.15rem] xl:text-[6rem]">
                         {t("title1")}
                     </span>
-                    <span className="block text-[2.2rem] leading-[1.05] sm:text-[3rem] md:text-[4rem] lg:text-[5rem] font-black tracking-[-0.035em] bg-clip-text text-transparent bg-gradient-to-r from-red-500 via-red-400 to-red-600 pb-2">
+                    <span className="mt-2 block bg-gradient-to-r from-[#ff9d9d] via-[#ff6a6a] to-[#ef4444] bg-clip-text pb-2 font-[family-name:var(--font-outfit)] text-[2.95rem] font-black leading-[0.94] tracking-[-0.05em] text-transparent sm:text-[4.1rem] md:text-[5.15rem] xl:text-[6rem]">
                         {t("title2")}
                     </span>
                 </motion.h1>
 
-                {/* Subtitle tags — clean visual hierarchy */}
-                <motion.div {...fadeUp(0.75)} className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mb-8">
-                    {["Foundation Year", "German Language", "University Pathway"].map((tag, i) => (
-                        <motion.span
-                            key={tag}
-                            whileHover={{ scale: 1.06, borderColor: "rgba(239,68,68,0.3)" }}
-                            className="px-4 py-1.5 rounded-full border border-white/[0.08] bg-white/[0.03] text-[11px] md:text-xs font-semibold tracking-[0.14em] uppercase text-white/40 hover:text-white/60 transition-colors cursor-default"
-                        >
-                            {tag}
-                        </motion.span>
-                    ))}
-                </motion.div>
-
-                {/* Short punchy description */}
-                <motion.p {...fadeUp(0.9)} className="text-sm sm:text-[15px] md:text-base text-white/40 font-light max-w-xl mx-auto leading-[1.9] mb-10">
+                <motion.p
+                    {...fadeUp(0.28)}
+                    className="mx-auto mt-6 max-w-3xl text-[15px] leading-8 text-white/74 sm:text-base"
+                >
                     {t("description")}
                 </motion.p>
 
-                {/* CTA */}
-                <motion.div {...fadeUp(1.1)} className="mb-14 z-50">
+                <motion.div {...fadeUp(0.38)} className="mt-7 flex flex-wrap items-center justify-center gap-2.5">
+                    {pillars.map((item, index) => (
+                        <button
+                            key={item.title}
+                            type="button"
+                            onMouseEnter={() => setActivePillar(index)}
+                            onFocus={() => setActivePillar(index)}
+                            onClick={() => setActivePillar(index)}
+                            className={`rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] backdrop-blur-xl transition-all duration-300 ${activePillar === index
+                                ? "border-red-300/28 bg-red-500/12 text-red-100 shadow-[0_0_30px_rgba(239,68,68,0.14)]"
+                                : "border-white/12 bg-white/[0.04] text-white/70 hover:border-white/24 hover:text-white"
+                                }`}
+                        >
+                            {item.title}
+                        </button>
+                    ))}
+                </motion.div>
+
+                <motion.div {...fadeUp(0.46)} className="mt-6 w-full max-w-2xl">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={activeItem.title}
+                            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.98 }}
+                            transition={{ duration: 0.35, ease: ENTRY_EASE }}
+                            className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(7,13,25,0.82),rgba(8,12,22,0.66))] px-5 py-5 shadow-[0_24px_60px_rgba(2,6,23,0.28)] backdrop-blur-xl sm:px-6"
+                        >
+                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.08),transparent_42%)]" />
+                            <div className="relative z-10 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
+                                <div className="flex items-center gap-4 text-left">
+                                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-red-300/20 bg-red-500/12 text-red-100">
+                                        <ActiveIcon className="h-6 w-6" />
+                                    </div>
+                                    <div>
+                                        <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/34">{activeItem.kicker}</div>
+                                        <div className="mt-2 text-xl font-bold tracking-[-0.03em] text-white">{activeItem.title}</div>
+                                        <div className="mt-1 text-sm text-white/56">{activeItem.detail}</div>
+                                    </div>
+                                </div>
+                                <div className="text-center sm:text-right">
+                                    <div className="text-4xl font-black tracking-[-0.05em] text-white">{activeItem.value}</div>
+                                    <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/30">Target pathway</div>
+                                </div>
+                            </div>
+                        </motion.div>
+                    </AnimatePresence>
+                </motion.div>
+
+                <motion.div
+                    {...fadeUp(0.54)}
+                    className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
+                >
                     <motion.button
-                        whileHover={{ scale: 1.05, boxShadow: "0 0 60px rgba(220,38,38,0.35)" }}
-                        whileTap={{ scale: 0.97 }}
-                        className="group relative px-10 py-4 md:px-12 md:py-[18px] text-sm md:text-[15px] font-bold text-white bg-gradient-to-r from-red-600 via-red-500 to-red-600 rounded-2xl shadow-[0_8px_30px_rgba(220,38,38,0.25)] transition-all duration-300 overflow-hidden"
+                        type="button"
+                        onClick={() => changeTab("admissions")}
+                        whileHover={{ scale: 1.03, boxShadow: "0 20px 60px rgba(239, 68, 68, 0.35)" }}
+                        whileTap={{ scale: 0.98 }}
+                        className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-red-600 via-red-500 to-red-600 px-8 py-4 text-sm font-bold text-white shadow-[0_16px_40px_rgba(220,38,38,0.28)] transition-all duration-300 sm:px-10"
                     >
-                        {/* Shine effect on hover */}
-                        <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-                        <span className="relative flex items-center gap-2.5">
-                            {t("cta")}
-                            <motion.span animate={{ x: [0, 5, 0] }} transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}>→</motion.span>
-                        </span>
+                        <span>{t("cta")}</span>
+                        <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    </motion.button>
+
+                    <motion.button
+                        type="button"
+                        onClick={() => changeTab("programs")}
+                        whileHover={{ scale: 1.02, borderColor: "rgba(255,255,255,0.22)" }}
+                        whileTap={{ scale: 0.98 }}
+                        className="inline-flex items-center justify-center rounded-2xl border border-white/14 bg-[#0b1326]/62 px-8 py-4 text-sm font-semibold text-white/82 backdrop-blur-xl transition-all duration-300 hover:bg-white/[0.08]"
+                    >
+                        {navT("programs")}
                     </motion.button>
                 </motion.div>
 
-                {/* Stats row — interactive cards */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 w-full max-w-2xl">
-                    <StatCard target={12000} suffix="+" label={t("stat1Label")} delay={1.4} />
-                    <StatCard target={95} suffix="%" label={t("stat2Label")} delay={1.5} />
-                    <StatCard target={40} suffix="+" label={t("stat3Label")} delay={1.6} />
-                    <StatCard target={2005} suffix="" label={t("stat4Label")} delay={1.7} />
-                </div>
-            </motion.div>
+                <motion.div {...fadeUp(0.66)} className="mt-7 flex max-w-4xl flex-wrap items-center justify-center gap-3">
+                    {trustItems.slice(0, 4).map((item) => (
+                        <div
+                            key={item}
+                            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/20 px-3 py-2 text-[11px] text-white/64 backdrop-blur-md"
+                        >
+                            <CheckCircle2 className="h-3.5 w-3.5 text-red-300" />
+                            <span>{item}</span>
+                        </div>
+                    ))}
+                </motion.div>
 
-            {/* Scroll indicator */}
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 2.8 }} className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
-                <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }} className="flex flex-col items-center gap-2">
-                    <span className="text-[8px] uppercase tracking-[0.3em] text-white/12 font-semibold">Scroll</span>
-                    <div className="w-[1px] h-7 bg-gradient-to-b from-red-500/20 to-transparent" />
+                <div className="mt-10 grid w-full max-w-4xl gap-3 grid-cols-2 lg:grid-cols-4">
+                    <StatCard target={12000} suffix="+" label={t("stat1Label")} delay={0.8} />
+                    <StatCard target={95} suffix="%" label={t("stat2Label")} delay={0.88} />
+                    <StatCard target={40} suffix="+" label={t("stat3Label")} delay={0.96} />
+                    <StatCard target={2005} suffix="" label={t("stat4Label")} delay={1.04} />
+                </div>
+
+                <motion.div {...fadeUp(1.12)} className="w-full">
+                    <InteractiveRoadmap />
                 </motion.div>
             </motion.div>
 
-            {/* Bottom fade */}
-            <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-[#0a0f1e] to-transparent z-20 pointer-events-none" />
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.15 }}
+                className="absolute bottom-6 left-1/2 z-30 -translate-x-1/2"
+            >
+                <motion.div
+                    animate={{ y: [0, 6, 0] }}
+                    transition={{ duration: 2.3, repeat: Infinity, ease: "easeInOut" }}
+                    className="flex flex-col items-center gap-2"
+                >
+                    <span className="text-[9px] font-semibold uppercase tracking-[0.32em] text-white/18">Scroll</span>
+                    <div className="h-8 w-px bg-gradient-to-b from-red-400/45 to-transparent" />
+                </motion.div>
+            </motion.div>
         </section>
     );
 }
+
+
+
+
