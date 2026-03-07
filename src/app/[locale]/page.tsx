@@ -9,19 +9,19 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import PartnerMarquee from "@/components/PartnerMarquee";
 
-const About = dynamic(() => import("@/components/About"), { ssr: false });
-const Comparison = dynamic(() => import("@/components/Comparison"), { ssr: false });
-const Guidelines = dynamic(() => import("@/components/Guidelines"), { ssr: false });
-const ROICalculator = dynamic(() => import("@/components/ROICalculator"), { ssr: false });
-const PathwayQuiz = dynamic(() => import("@/components/PathwayQuiz"), { ssr: false });
-const AlumniCarousel = dynamic(() => import("@/components/AlumniCarousel"), { ssr: false });
-const RouteMap = dynamic(() => import("@/components/RouteMap"), { ssr: false });
-const Programs = dynamic(() => import("@/components/Programs"), { ssr: false });
-const GermanCourses = dynamic(() => import("@/components/GermanCourses"), { ssr: false });
-const Opportunities = dynamic(() => import("@/components/Opportunities"), { ssr: false });
-const CampusLife = dynamic(() => import("@/components/CampusLife"), { ssr: false });
-const Admissions = dynamic(() => import("@/components/Admissions"), { ssr: false });
-const Footer = dynamic(() => import("@/components/Footer"), { ssr: false });
+const About = dynamic(() => import("@/components/About"));
+const Comparison = dynamic(() => import("@/components/Comparison"));
+const Guidelines = dynamic(() => import("@/components/Guidelines"));
+const ROICalculator = dynamic(() => import("@/components/ROICalculator"));
+const PathwayQuiz = dynamic(() => import("@/components/PathwayQuiz"));
+const AlumniCarousel = dynamic(() => import("@/components/AlumniCarousel"));
+const RouteMap = dynamic(() => import("@/components/RouteMap"));
+const Programs = dynamic(() => import("@/components/Programs"));
+const GermanCourses = dynamic(() => import("@/components/GermanCourses"));
+const Opportunities = dynamic(() => import("@/components/Opportunities"));
+const CampusLife = dynamic(() => import("@/components/CampusLife"));
+const Admissions = dynamic(() => import("@/components/Admissions"));
+const Footer = dynamic(() => import("@/components/Footer"));
 
 const ENTRY_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 

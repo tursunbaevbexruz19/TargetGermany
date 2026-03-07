@@ -31,7 +31,7 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
         <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
+            viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.7, delay, ease: ENTRY_EASE }}
         >
             {children}
@@ -231,11 +231,10 @@ export default function About() {
                                                 onMouseEnter={() => setActiveEssential(index)}
                                                 onFocus={() => setActiveEssential(index)}
                                                 onClick={() => setActiveEssential(index)}
-                                                className={`group flex min-h-[148px] flex-col rounded-[22px] border p-4 text-left transition-all duration-300 ${
-                                                    isActive
+                                                className={`group flex min-h-[148px] flex-col rounded-[22px] border p-4 text-left transition-all duration-300 ${isActive
                                                         ? "border-red-400/24 bg-[linear-gradient(180deg,rgba(239,68,68,0.12),rgba(255,255,255,0.03))] shadow-[0_18px_40px_rgba(15,23,42,0.18)]"
                                                         : "border-white/8 bg-white/[0.03] hover:-translate-y-1 hover:border-white/14 hover:bg-white/[0.05]"
-                                                }`}
+                                                    }`}
                                             >
                                                 <div className="flex items-start justify-between gap-3">
                                                     <div className={`flex h-10 w-10 items-center justify-center rounded-2xl border ${isActive ? "border-red-300/20 bg-red-500/12 text-red-100" : "border-white/8 bg-white/[0.03] text-white/62"}`}>
