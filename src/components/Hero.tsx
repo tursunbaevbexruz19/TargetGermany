@@ -33,11 +33,11 @@ const CinematicOrbLayer = memo(function CinematicOrbLayer({ reduceMotion }: { re
                     reduceMotion
                         ? { opacity: 0.48, scale: 1 }
                         : {
-                              x: ["0%", "10%", "-4%", "0%"],
-                              y: ["0%", "8%", "14%", "0%"],
-                              scale: [1, 1.08, 0.94, 1],
-                              opacity: [0.48, 0.72, 0.42, 0.48],
-                          }
+                            x: ["0%", "10%", "-4%", "0%"],
+                            y: ["0%", "8%", "14%", "0%"],
+                            scale: [1, 1.08, 0.94, 1],
+                            opacity: [0.48, 0.72, 0.42, 0.48],
+                        }
                 }
                 transition={reduceMotion ? { duration: 0.2 } : { duration: 26, repeat: Infinity, ease: "linear" }}
             />
@@ -47,11 +47,11 @@ const CinematicOrbLayer = memo(function CinematicOrbLayer({ reduceMotion }: { re
                     reduceMotion
                         ? { opacity: 0.42, scale: 1 }
                         : {
-                              x: ["0%", "-10%", "8%", "0%"],
-                              y: ["0%", "-8%", "-12%", "0%"],
-                              scale: [0.94, 1.1, 0.97, 0.94],
-                              opacity: [0.4, 0.6, 0.34, 0.4],
-                          }
+                            x: ["0%", "-10%", "8%", "0%"],
+                            y: ["0%", "-8%", "-12%", "0%"],
+                            scale: [0.94, 1.1, 0.97, 0.94],
+                            opacity: [0.4, 0.6, 0.34, 0.4],
+                        }
                 }
                 transition={reduceMotion ? { duration: 0.2 } : { duration: 30, repeat: Infinity, ease: "linear" }}
             />
@@ -325,10 +325,10 @@ export default function Hero({ setActiveTab }: { setActiveTab?: (tab: string) =>
                 </motion.div>
 
                 <motion.h1 {...fadeUp(0.18)} className="mt-6 max-w-5xl text-balance">
-                    <span className="block font-[family-name:var(--font-outfit)] text-[2.95rem] font-black leading-[0.94] tracking-[-0.05em] text-white sm:text-[4.1rem] md:text-[5.15rem] xl:text-[6rem]">
+                    <span className="block font-[family-name:var(--font-outfit)] text-[2.95rem] font-bold leading-[1.05] tracking-[-0.03em] text-white sm:text-[4.1rem] md:text-[5.15rem] xl:text-[6rem]">
                         {t("title1")}
                     </span>
-                    <span className="mt-2 block bg-gradient-to-r from-[#ff9d9d] via-[#ff6a6a] to-[#ef4444] bg-clip-text pb-2 font-[family-name:var(--font-outfit)] text-[2.95rem] font-black leading-[0.94] tracking-[-0.05em] text-transparent sm:text-[4.1rem] md:text-[5.15rem] xl:text-[6rem]">
+                    <span className="mt-2 block bg-gradient-to-r from-[#ff9d9d] via-[#ff6a6a] to-[#ef4444] bg-clip-text pb-2 font-[family-name:var(--font-outfit)] text-[2.95rem] font-bold leading-[1.05] tracking-[-0.03em] text-transparent sm:text-[4.1rem] md:text-[5.15rem] xl:text-[6rem]">
                         {t("title2")}
                     </span>
                 </motion.h1>

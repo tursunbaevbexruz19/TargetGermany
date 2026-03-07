@@ -1,3 +1,4 @@
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@200,400,700,500,600,300&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -7,6 +8,7 @@
   --accent-glow: rgba(239, 68, 68, 0.15);
   --font-inter: "Inter", "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --font-outfit: "Outfit", "Avenir Next", "Trebuchet MS", "Segoe UI", sans-serif;
+  --font-clash: "Clash Display", "Outfit", "Avenir Next", sans-serif;
 }
 
 @theme inline {
@@ -114,6 +116,7 @@ textarea:focus {
 }
 
 @keyframes float {
+
   0%,
   100% {
     opacity: 0;
@@ -127,6 +130,7 @@ textarea:focus {
 }
 
 @keyframes pulse-glow {
+
   0%,
   100% {
     box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
@@ -152,6 +156,7 @@ textarea:focus {
 }
 
 @keyframes gradient-shift {
+
   0%,
   100% {
     background-position: 0% 50%;

@@ -68,8 +68,8 @@ export default function Footer({ setActiveTab }: { setActiveTab?: (t: string) =>
                 >
                     <motion.div variants={staggerItem} className="rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015))] p-6 md:p-7">
                         <button onClick={() => jumpTo("home")} className="group flex cursor-pointer items-center gap-3 text-left">
-                            <div className="relative h-10 w-10 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]">
-                                <Image src="/logo-white.png" alt="Logo" fill className="object-contain p-1.5" />
+                            <div className="relative h-10 w-10 overflow-hidden rounded-[10px]">
+                                <Image src="/logo.jpg" alt="Logo" fill className="object-cover" />
                             </div>
                             <div className="flex flex-col items-start">
                                 <span className="font-[family-name:var(--font-outfit)] text-lg font-black leading-none tracking-tight text-white">Target International</span>

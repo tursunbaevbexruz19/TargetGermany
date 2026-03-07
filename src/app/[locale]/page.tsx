@@ -95,7 +95,7 @@ function LoadingScreen({ onComplete, reduceMotion }: { onComplete: () => void; r
                     transition={{ duration: reduceMotion ? 0.2 : 0.4, delay: reduceMotion ? 0.12 : 0.5 }}
                     className="mt-2 text-[10px] font-semibold uppercase tracking-[0.3em] text-white/30 md:text-xs"
                 >
-                    Improve our self-value
+                    Improve your self-value
                 </motion.p>
             </motion.div>
 
