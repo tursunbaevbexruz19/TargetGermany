@@ -32,7 +32,7 @@ export default function Opportunities() {
             <div className="absolute top-0 left-1/3 w-[500px] h-[500px] bg-red-600/[0.03] rounded-full blur-[200px] pointer-events-none" />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <motion.div initial={{ opacity: 0, y: 25 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} className="text-center mb-20">
+                <motion.div initial={{ opacity: 0, y: 25 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-20">
                     <span className="inline-block px-5 py-2 rounded-full bg-white/[0.04] border border-white/[0.08] text-[10px] md:text-xs font-bold tracking-[0.25em] uppercase text-white/50 mb-8">{t("sectionLabel")}</span>
                     <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 tracking-[-0.02em] font-[family-name:var(--font-outfit)]">{t("title")}</h2>
                     <p className="text-base md:text-lg text-white/45 max-w-2xl mx-auto leading-relaxed">{t("description")}</p>
@@ -53,7 +53,7 @@ export default function Opportunities() {
                 </div>
 
                 {/* Career pathways */}
-                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} className="rounded-3xl p-8 md:p-12 bg-gradient-to-br from-red-500/[0.07] via-red-900/[0.03] to-transparent border border-red-500/12 relative overflow-hidden">
+                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="rounded-3xl p-8 md:p-12 bg-gradient-to-br from-red-500/[0.07] via-red-900/[0.03] to-transparent border border-red-500/12 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/5 rounded-full blur-[100px] pointer-events-none" />
                     <div className="relative z-10">
                         <div className="flex items-center gap-3 mb-2">
@@ -64,7 +64,7 @@ export default function Opportunities() {
                         <p className="text-white/35 mb-8 text-sm">Your career starts with your education in Germany</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {pathways.map((p, idx) => (
-                                <motion.div key={idx} initial={{ opacity: 0, x: -8 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ delay: idx * 0.08 }} className="flex items-center gap-3 group">
+                                <motion.div key={idx} initial={{ opacity: 0, x: -8 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: idx * 0.08 }} className="flex items-center gap-3 group">
                                     <CheckCircle2 className="w-5 h-5 text-red-400 shrink-0 group-hover:scale-110 transition-transform" />
                                     <span className="text-sm text-white/55 group-hover:text-white/75 transition-colors">{p}</span>
                                 </motion.div>
@@ -94,7 +94,7 @@ function SpotlightStatCard({ stat, idx }: { stat: any, idx: number }) {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
+            viewport={{ once: true }}
             transition={{ delay: idx * 0.1 }}
             whileHover={{ y: -3 }}
             onMouseMove={handleMouseMove}
@@ -142,7 +142,7 @@ function UniversityCard({ uni, idx }: { uni: any, idx: number }) {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-60px" }}
+                viewport={{ once: true }}
                 transition={{ delay: idx * 0.08 }}
                 animate={{ rotateY: isFlipped ? 180 : 0 }}
                 style={{ transformStyle: "preserve-3d" }}

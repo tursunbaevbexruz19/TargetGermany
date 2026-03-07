@@ -93,7 +93,7 @@ export default function CampusLife() {
                     <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-white/46 md:text-lg">{t("description")}</p>
                 </motion.div>
 
-                <motion.div initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.7, ease: ENTRY_EASE }} className="overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(8,14,28,0.95),rgba(5,9,20,0.92))] shadow-[0_24px_70px_rgba(0,0,0,0.26)]">
+                <motion.div initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ duration: 0.7, ease: ENTRY_EASE }} className="overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(8,14,28,0.95),rgba(5,9,20,0.92))] shadow-[0_24px_70px_rgba(0,0,0,0.26)]">
                     <div className="grid gap-0 xl:grid-cols-[minmax(0,1fr)_minmax(360px,1fr)] xl:items-stretch">
                         <div className="relative min-h-[320px] overflow-hidden xl:min-h-[100%]">
                             <Image src="/Germany-Berlin.jpg" alt="Germany Campus" fill className="object-cover" sizes="(max-width: 1280px) 100vw, 48vw" />
@@ -109,7 +109,7 @@ export default function CampusLife() {
                         <div className="flex h-full flex-col p-5 md:p-6">
                             <div className="grid gap-3 sm:grid-cols-2">
                                 {germanFeatures.map((feature, index) => (
-                                    <motion.div key={feature.label} initial={{ opacity: 0, y: reduceMotion ? 0 : 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.45, delay: index * 0.05, ease: ENTRY_EASE }} whileHover={{ y: -2 }} className="min-h-[132px] rounded-[22px] border border-white/[0.08] bg-white/[0.03] p-4">
+                                    <motion.div key={feature.label} initial={{ opacity: 0, y: reduceMotion ? 0 : 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.35 }} transition={{ duration: 0.45, delay: index * 0.05, ease: ENTRY_EASE }} whileHover={{ y: -2 }} className="min-h-[132px] rounded-[22px] border border-white/[0.08] bg-white/[0.03] p-4">
                                         <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-red-300"><feature.icon className="h-4 w-4" /></div>
                                         <p className="mt-4 text-sm leading-6 text-white/64">{feature.label}</p>
                                     </motion.div>
@@ -118,7 +118,7 @@ export default function CampusLife() {
 
                             <div className="mt-4 grid gap-3 sm:grid-cols-2">
                                 {germanyActivities.map((item, index) => (
-                                    <motion.div key={item.title} initial={{ opacity: 0, y: reduceMotion ? 0 : 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.45, delay: 0.16 + index * 0.05, ease: ENTRY_EASE }} className="min-h-[132px] rounded-[22px] border border-red-400/12 bg-[linear-gradient(180deg,rgba(239,68,68,0.08),rgba(255,255,255,0.02))] p-4">
+                                    <motion.div key={item.title} initial={{ opacity: 0, y: reduceMotion ? 0 : 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.35 }} transition={{ duration: 0.45, delay: 0.16 + index * 0.05, ease: ENTRY_EASE }} className="min-h-[132px] rounded-[22px] border border-red-400/12 bg-[linear-gradient(180deg,rgba(239,68,68,0.08),rgba(255,255,255,0.02))] p-4">
                                         <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-red-100/72">{item.title}</div>
                                         <p className="mt-3 text-sm leading-6 text-white/60">{item.text}</p>
                                     </motion.div>
@@ -130,14 +130,14 @@ export default function CampusLife() {
 
                 <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                     {statRail.map((item, index) => (
-                        <motion.div key={item.label} initial={{ opacity: 0, y: reduceMotion ? 0 : 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.45, delay: index * 0.05, ease: ENTRY_EASE }} className="rounded-[22px] border border-white/[0.08] bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.015))] p-4">
+                        <motion.div key={item.label} initial={{ opacity: 0, y: reduceMotion ? 0 : 16 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.35 }} transition={{ duration: 0.45, delay: index * 0.05, ease: ENTRY_EASE }} className="rounded-[22px] border border-white/[0.08] bg-[linear-gradient(180deg,rgba(255,255,255,0.035),rgba(255,255,255,0.015))] p-4">
                             <div className="text-3xl font-black tracking-[-0.04em] text-white">{item.value}</div>
                             <div className="mt-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/34">{item.label}</div>
                         </motion.div>
                     ))}
                 </div>
 
-                <motion.div initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-60px" }} transition={{ duration: 0.7, delay: 0.08, ease: ENTRY_EASE }} className="mt-10 overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(8,14,28,0.95),rgba(5,9,20,0.92))] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.26)] md:p-6">
+                <motion.div initial={{ opacity: 0, y: 22 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.2 }} transition={{ duration: 0.7, delay: 0.08, ease: ENTRY_EASE }} className="mt-10 overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(8,14,28,0.95),rgba(5,9,20,0.92))] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.26)] md:p-6">
                     <div className="grid gap-6 xl:grid-cols-[minmax(320px,0.94fr)_minmax(0,1.06fr)] xl:items-stretch">
                         <div className="flex h-full flex-col">
                             <div>

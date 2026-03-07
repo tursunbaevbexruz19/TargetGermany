@@ -31,7 +31,7 @@ function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
         <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
+            viewport={{ once: true, amount: 0.25 }}
             transition={{ duration: 0.7, delay, ease: ENTRY_EASE }}
         >
             {children}
@@ -179,45 +179,47 @@ export default function About() {
                                 </motion.a>
                             </div>
 
-                            <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,0.98fr)_minmax(0,1.02fr)] xl:items-start">
-                                <AnimatePresence mode="wait" initial={false}>
-                                    <motion.div
-                                        key={activeItem.title}
-                                        initial={{ opacity: 0, y: 14, scale: 0.99 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, y: 10, scale: 0.99 }}
-                                        transition={{ duration: 0.35, ease: ENTRY_EASE }}
-                                        className="relative overflow-hidden rounded-[26px] border border-red-400/16 bg-[linear-gradient(180deg,rgba(40,16,26,0.24),rgba(10,17,29,0.96))] p-5 md:p-6 xl:min-h-[438px]"
-                                    >
-                                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.06),transparent_40%)]" />
-                                        <div className="relative z-10 flex h-full flex-col">
-                                            <div className="flex items-start justify-between gap-4">
-                                                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-red-300/20 bg-red-500/12 text-red-100">
-                                                    <ActiveIcon className="h-5 w-5" />
-                                                </div>
-                                                <div className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/40">
-                                                    Germany essentials
-                                                </div>
-                                            </div>
-
-                                            <div className="mt-6 whitespace-nowrap text-[clamp(2.5rem,5vw,4rem)] font-black tracking-[-0.05em] text-white">{activeItem.value}</div>
-                                            <div className="mt-2 flex items-center gap-2 text-white">
-                                                <h4 className="text-lg font-bold tracking-[-0.02em]">{activeItem.title}</h4>
-                                                <ArrowUpRight className="h-4 w-4 text-red-200" />
-                                            </div>
-                                            <p className="mt-4 max-w-xl text-sm leading-7 text-white/62 md:text-[15px] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:6] overflow-hidden">{activeItem.desc}</p>
-
-                                            <div className="mt-5 grid gap-2 sm:grid-cols-2">
-                                                {supportHighlights.map((item) => (
-                                                    <div key={item.label} className="min-h-[88px] rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
-                                                        <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/28">{item.label}</div>
-                                                        <div className="mt-2 text-sm leading-6 text-white/66">{item.value}</div>
+                            <div className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,0.98fr)_minmax(0,1.02fr)] xl:items-stretch">
+                                <div className="w-full min-h-[580px] sm:min-h-[500px] xl:min-h-[460px]">
+                                    <AnimatePresence mode="wait" initial={false}>
+                                        <motion.div
+                                            key={activeItem.title}
+                                            initial={{ opacity: 0, y: 14, scale: 0.99 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: 10, scale: 0.99 }}
+                                            transition={{ duration: 0.35, ease: ENTRY_EASE }}
+                                            className="relative flex h-full w-full flex-col overflow-hidden rounded-[26px] border border-red-400/16 bg-[linear-gradient(180deg,rgba(40,16,26,0.24),rgba(10,17,29,0.96))] p-5 md:p-6"
+                                        >
+                                            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.06),transparent_40%)]" />
+                                            <div className="relative z-10 flex h-full flex-col">
+                                                <div className="flex items-start justify-between gap-4">
+                                                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-red-300/20 bg-red-500/12 text-red-100">
+                                                        <ActiveIcon className="h-5 w-5" />
                                                     </div>
-                                                ))}
+                                                    <div className="inline-flex items-center rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-white/40">
+                                                        Germany essentials
+                                                    </div>
+                                                </div>
+
+                                                <div className="mt-6 text-[clamp(2.1rem,4.2vw,3.2rem)] font-black leading-[1.05] tracking-[-0.04em] text-white">{activeItem.value}</div>
+                                                <div className="mt-2 flex items-center gap-2 text-white">
+                                                    <h4 className="text-lg font-bold tracking-[-0.02em]">{activeItem.title}</h4>
+                                                    <ArrowUpRight className="h-4 w-4 text-red-200" />
+                                                </div>
+                                                <p className="min-h-[150px] mt-4 max-w-xl text-sm leading-7 text-white/62 md:text-[15px] sm:min-h-[110px] xl:min-h-0">{activeItem.desc}</p>
+
+                                                <div className="mt-auto pt-5 grid gap-2 sm:grid-cols-2">
+                                                    {supportHighlights.map((item) => (
+                                                        <div key={item.label} className="flex min-h-[88px] flex-col justify-center rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3">
+                                                            <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/28">{item.label}</div>
+                                                            <div className="mt-1 text-sm leading-6 text-white/66">{item.value}</div>
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             </div>
-                                        </div>
-                                    </motion.div>
-                                </AnimatePresence>
+                                        </motion.div>
+                                    </AnimatePresence>
+                                </div>
 
                                 <div className="grid gap-3 sm:grid-cols-2">
                                     {essentials.map((item, index) => {
@@ -232,8 +234,8 @@ export default function About() {
                                                 onFocus={() => setActiveEssential(index)}
                                                 onClick={() => setActiveEssential(index)}
                                                 className={`group flex min-h-[148px] flex-col rounded-[22px] border p-4 text-left transition-all duration-300 ${isActive
-                                                        ? "border-red-400/24 bg-[linear-gradient(180deg,rgba(239,68,68,0.12),rgba(255,255,255,0.03))] shadow-[0_18px_40px_rgba(15,23,42,0.18)]"
-                                                        : "border-white/8 bg-white/[0.03] hover:-translate-y-1 hover:border-white/14 hover:bg-white/[0.05]"
+                                                    ? "border-red-400/24 bg-[linear-gradient(180deg,rgba(239,68,68,0.12),rgba(255,255,255,0.03))] shadow-[0_18px_40px_rgba(15,23,42,0.18)]"
+                                                    : "border-white/8 bg-white/[0.03] hover:-translate-y-1 hover:border-white/14 hover:bg-white/[0.05]"
                                                     }`}
                                             >
                                                 <div className="flex items-start justify-between gap-3">

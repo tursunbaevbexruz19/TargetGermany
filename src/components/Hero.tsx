@@ -325,10 +325,10 @@ export default function Hero({ setActiveTab }: { setActiveTab?: (tab: string) =>
                 </motion.div>
 
                 <motion.h1 {...fadeUp(0.18)} className="mt-6 max-w-5xl text-balance">
-                    <span className="block font-[family-name:var(--font-outfit)] text-[2.95rem] font-bold leading-[1.05] tracking-[-0.03em] text-white sm:text-[4.1rem] md:text-[5.15rem] xl:text-[6rem]">
+                    <span className="block font-[family-name:var(--font-outfit)] text-[3.2rem] font-black leading-[1.02] tracking-[-0.04em] text-white sm:text-[4.5rem] md:text-[5.75rem] xl:text-[6.5rem]">
                         {t("title1")}
                     </span>
-                    <span className="mt-2 block bg-gradient-to-r from-[#ff9d9d] via-[#ff6a6a] to-[#ef4444] bg-clip-text pb-2 font-[family-name:var(--font-outfit)] text-[2.95rem] font-bold leading-[1.05] tracking-[-0.03em] text-transparent sm:text-[4.1rem] md:text-[5.15rem] xl:text-[6rem]">
+                    <span className="mt-1 block font-[family-name:var(--font-outfit)] text-[3.2rem] font-black leading-[1.02] tracking-[-0.04em] text-red-500 drop-shadow-[0_0_30px_rgba(239,68,68,0.4)] sm:text-[4.5rem] md:text-[5.75rem] xl:text-[6.5rem]">
                         {t("title2")}
                     </span>
                 </motion.h1>
@@ -348,9 +348,9 @@ export default function Hero({ setActiveTab }: { setActiveTab?: (tab: string) =>
                             onMouseEnter={() => setActivePillar(index)}
                             onFocus={() => setActivePillar(index)}
                             onClick={() => setActivePillar(index)}
-                            className={`rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] backdrop-blur-xl transition-all duration-300 ${activePillar === index
-                                ? "border-red-300/28 bg-red-500/12 text-red-100 shadow-[0_0_30px_rgba(239,68,68,0.14)]"
-                                : "border-white/12 bg-white/[0.04] text-white/70 hover:border-white/24 hover:text-white"
+                            className={`rounded-full border px-5 py-2.5 text-[12px] font-bold uppercase tracking-[0.18em] transition-all duration-300 ${activePillar === index
+                                ? "scale-105 border-red-500 bg-red-600 text-white shadow-[0_8px_24px_rgba(220,38,38,0.35)]"
+                                : "border-white/10 bg-[#070b14]/80 text-white/50 hover:border-white/20 hover:bg-[#070b14] hover:text-white"
                                 }`}
                         >
                             {item.title}
@@ -358,15 +358,15 @@ export default function Hero({ setActiveTab }: { setActiveTab?: (tab: string) =>
                     ))}
                 </motion.div>
 
-                <motion.div {...fadeUp(0.46)} className="mt-6 w-full max-w-2xl">
+                <motion.div {...fadeUp(0.46)} className="mt-10 mb-6 w-full max-w-2xl">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={activeItem.title}
-                            initial={{ opacity: 0, y: 12, scale: 0.98 }}
+                            initial={{ opacity: 0, y: 16, scale: 0.96 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 10, scale: 0.98 }}
-                            transition={{ duration: 0.35, ease: ENTRY_EASE }}
-                            className="relative overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(7,13,25,0.82),rgba(8,12,22,0.66))] px-5 py-5 shadow-[0_24px_60px_rgba(2,6,23,0.28)] backdrop-blur-xl sm:px-6"
+                            exit={{ opacity: 0, y: 12, scale: 0.96 }}
+                            transition={{ type: "spring", stiffness: 280, damping: 24 }}
+                            className="relative overflow-hidden rounded-[32px] border-2 border-red-500/20 bg-[#040812]/95 px-6 py-7 shadow-[0_32px_80px_rgba(0,0,0,0.7)] backdrop-blur-2xl sm:px-8"
                         >
                             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.08),transparent_42%)]" />
                             <div className="relative z-10 flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
@@ -391,14 +391,14 @@ export default function Hero({ setActiveTab }: { setActiveTab?: (tab: string) =>
 
                 <motion.div
                     {...fadeUp(0.54)}
-                    className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
+                    className="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
                 >
                     <motion.button
                         type="button"
                         onClick={() => changeTab("admissions")}
-                        whileHover={{ scale: 1.03, boxShadow: "0 20px 60px rgba(239, 68, 68, 0.35)" }}
+                        whileHover={{ scale: 1.03, boxShadow: "0 20px 60px rgba(239, 68, 68, 0.45)" }}
                         whileTap={{ scale: 0.98 }}
-                        className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-red-600 via-red-500 to-red-600 px-8 py-4 text-sm font-bold text-white shadow-[0_16px_40px_rgba(220,38,38,0.28)] transition-all duration-300 sm:px-10"
+                        className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-red-600 via-red-500 to-red-600 px-8 py-4 text-sm font-bold text-white shadow-[0_16px_40px_rgba(220,38,38,0.38)] transition-all duration-300 sm:px-10"
                     >
                         <span>{t("cta")}</span>
                         <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -407,9 +407,9 @@ export default function Hero({ setActiveTab }: { setActiveTab?: (tab: string) =>
                     <motion.button
                         type="button"
                         onClick={() => changeTab("programs")}
-                        whileHover={{ scale: 1.02, borderColor: "rgba(255,255,255,0.22)" }}
+                        whileHover={{ scale: 1.02, borderColor: "rgba(255,255,255,0.28)" }}
                         whileTap={{ scale: 0.98 }}
-                        className="inline-flex items-center justify-center rounded-2xl border border-white/14 bg-[#0b1326]/62 px-8 py-4 text-sm font-semibold text-white/82 backdrop-blur-xl transition-all duration-300 hover:bg-white/[0.08]"
+                        className="inline-flex items-center justify-center rounded-2xl border border-white/16 bg-[#040812]/90 px-8 py-4 text-sm font-semibold text-white/90 backdrop-blur-xl transition-all duration-300 hover:bg-white/[0.12]"
                     >
                         {navT("programs")}
                     </motion.button>
