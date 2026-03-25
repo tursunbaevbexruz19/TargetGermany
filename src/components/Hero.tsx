@@ -16,6 +16,7 @@ const TRUST_FALLBACKS = [
 ];
 
 function splitList(value: string, fallback: string[]) {
+    if (!value) return fallback;
     const items = value
         .split("·")
         .map((item) => item.trim())
@@ -134,7 +135,6 @@ function StatCard({ target, suffix, label, delay }: { target: number; suffix: st
     );
 }
 
-/* ── Interactive Roadmap Component ── */
 function InteractiveRoadmap() {
     const [activeStep, setActiveStep] = useState<number | null>(null);
 
@@ -150,12 +150,12 @@ function InteractiveRoadmap() {
             <h3 className="text-white/60 text-[11px] font-bold uppercase tracking-[0.2em] text-center mb-8">Your Journey to Germany</h3>
 
             <div className="relative">
-                {/* Connecting Line */}
                 <div className="absolute top-6 left-[10%] right-[10%] h-[2px] bg-white/[0.05] hidden md:block" />
 
                 <div className="flex flex-col md:flex-row justify-between gap-6 md:gap-0 relative z-10">
                     {steps.map((step, idx) => {
                         const isActive = activeStep === idx;
+                        const Icon = step.icon;
                         return (
                             <div
                                 key={step.id}
@@ -168,7 +168,7 @@ function InteractiveRoadmap() {
                                     className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 relative z-10 
                                         ${isActive ? "bg-red-500 shadow-[0_0_30px_rgba(239,68,68,0.5)] scale-110" : "bg-[#0a0f1e] border-2 border-white/[0.1] group-hover:border-red-500/50"}`}
                                 >
-                                    <step.icon className={`w-5 h-5 ${isActive ? "text-white" : "text-white/40 group-hover:text-red-400"}`} />
+                                    <Icon className={`w-5 h-5 ${isActive ? "text-white" : "text-white/40 group-hover:text-red-400"}`} />
                                 </motion.div>
 
                                 <div className="mt-4 text-center">
@@ -199,7 +199,7 @@ function InteractiveRoadmap() {
     );
 }
 
-export default function Hero({ setActiveTab }: { setActiveTab?: (tab: string) => void }) {
+export default function Hero({ setActiveTab, dynamicData }: { setActiveTab?: (tab: string) => void, dynamicData?: any }) {
     const t = useTranslations("Hero");
     const navT = useTranslations("Navbar");
     const containerRef = useRef<HTMLDivElement>(null);
@@ -319,17 +319,17 @@ export default function Hero({ setActiveTab }: { setActiveTab?: (tab: string) =>
                             <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-400 shadow-[0_0_14px_rgba(248,113,113,0.85)]" />
                         </span>
                         <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-red-100/88 sm:text-xs">
-                            {t("badge")}
+                            {dynamicData?.badge || t("badge")}
                         </span>
                     </div>
                 </motion.div>
 
                 <motion.h1 {...fadeUp(0.18)} className="mt-6 max-w-5xl text-balance">
                     <span className="block font-[family-name:var(--font-outfit)] text-[3.2rem] font-black leading-[1.02] tracking-[-0.04em] text-white sm:text-[4.5rem] md:text-[5.75rem] xl:text-[6.5rem]">
-                        {t("title1")}
+                        {dynamicData?.titleLine1 || t("title1")}
                     </span>
                     <span className="mt-1 block font-[family-name:var(--font-outfit)] text-[3.2rem] font-black leading-[1.02] tracking-[-0.04em] text-red-500 drop-shadow-[0_0_30px_rgba(239,68,68,0.4)] sm:text-[4.5rem] md:text-[5.75rem] xl:text-[6.5rem]">
-                        {t("title2")}
+                        {dynamicData?.titleLine2 || t("title2")}
                     </span>
                 </motion.h1>
 
@@ -337,7 +337,7 @@ export default function Hero({ setActiveTab }: { setActiveTab?: (tab: string) =>
                     {...fadeUp(0.28)}
                     className="mx-auto mt-6 max-w-3xl text-[15px] leading-8 text-white/74 sm:text-base"
                 >
-                    {t("description")}
+                    {dynamicData?.description || t("description")}
                 </motion.p>
 
                 <motion.div {...fadeUp(0.38)} className="mt-7 flex flex-wrap items-center justify-center gap-2.5">
@@ -457,7 +457,3 @@ export default function Hero({ setActiveTab }: { setActiveTab?: (tab: string) =>
         </section>
     );
 }
-
-
-
-
