@@ -12,24 +12,35 @@ export default async function Page({ params }: PageProps) {
 
   // Fetch Hero data from Sanity
   let heroData = null
+  let coursesData = null
+
   try {
-    const data = await client.fetch(
+    const heroResult = await client.fetch(
       `*[_type == "hero" && language == $locale][0]`,
       { locale: locale }
     )
-    if (data) {
+    if (heroResult) {
       // Map Sanity fields to HomeClient expected props
       heroData = {
-        badge: data.badge,
-        badgeText: data.badge,
-        title: data.title,
-        description: data.description,
-        primaryButton: data.ctaText,
+        badge: heroResult.badge,
+        badgeText: heroResult.badge,
+        title: heroResult.title,
+        description: heroResult.description,
+        primaryButton: heroResult.ctaText,
       }
     }
+
+    // Fetch courses aligned with language
+    const coursesResult = await client.fetch(
+      `*[_type == "course" && language == $locale] | order(_createdAt asc)`,
+      { locale: locale }
+    )
+    if (coursesResult && coursesResult.length > 0) {
+      coursesData = coursesResult
+    }
   } catch (err) {
-    console.error('Error fetching hero data from Sanity:', err)
+    console.error('Error fetching data from Sanity:', err)
   }
 
-  return <HomeClient heroData={heroData} />
+  return <HomeClient heroData={heroData} coursesData={coursesData} />
 }

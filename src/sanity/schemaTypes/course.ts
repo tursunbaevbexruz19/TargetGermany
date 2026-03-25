@@ -23,11 +23,26 @@ export const courseType = {
       type: 'text',
     },
     {
-      name: 'image',
-      title: 'Course Image',
-      type: 'image',
+      name: 'levels',
+      title: 'Levels (e.g. A1, A2, B1, B2)',
+      type: 'string',
+    },
+    {
+      name: 'duration',
+      title: 'Duration & Times (e.g. 8 Weeks, Mon-Fri 09:00)',
+      type: 'string',
+    },
+    {
+      name: 'iconType',
+      title: 'Icon Type',
+      type: 'string',
       options: {
-        hotspot: true,
+        list: [
+          { title: 'Calculator (Math)', value: 'math' },
+          { title: 'Flask (Science)', value: 'science' },
+          { title: 'Globe (Humanities/Languages)', value: 'globe' },
+          { title: 'Book (Test Prep)', value: 'book' },
+        ],
       },
     },
     {
