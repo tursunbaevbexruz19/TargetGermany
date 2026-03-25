@@ -36,10 +36,14 @@ export const heroType = {
       options: {
         list: [
           { title: 'English', value: 'en' },
+          { title: 'Deutsch', value: 'de' },
+          { title: 'Uzbek', value: 'uz' },
           { title: 'Russian', value: 'ru' },
-          { title: 'German', value: 'de' },
-          { title: 'Uzbek (Latin)', value: 'uz-latn' },
-          { title: 'Uzbek (Cyrillic)', value: 'uz-cyrl' },
+          { title: 'Spanish', value: 'es' },
+          { title: 'Arabic', value: 'ar' },
+          { title: 'Chinese', value: 'zh' },
+          { title: 'Korean', value: 'ko' },
+          { title: 'Turkish', value: 'tr' },
         ],
       },
     },

@@ -7,6 +7,8 @@ interface PageProps {
   }>
 }
 
+export const revalidate = 30 // revalidate at most every 30 seconds
+
 export default async function Page({ params }: PageProps) {
   const { locale } = await params
 
