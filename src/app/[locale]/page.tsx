@@ -20,10 +20,19 @@ const Programs = dynamic(() => import("@/components/Programs"), { ssr: false });
 const GermanCourses = dynamic(() => import("@/components/GermanCourses"), { ssr: false });
 const Opportunities = dynamic(() => import("@/components/Opportunities"), { ssr: false });
 const CampusLife = dynamic(() => import("@/components/CampusLife"), { ssr: false });
-const Admissions = dynamic(() => import("@/components/Admissions"), { ssr: false });
+const ContactUs = dynamic(() => import("@/components/ContactUs"), { ssr: false });
 const Footer = dynamic(() => import("@/components/Footer"), { ssr: false });
 
 const ENTRY_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+const lightweightPreloaders = [
+    () => import("@/components/About"),
+    () => import("@/components/Programs"),
+    () => import("@/components/ContactUs"),
+];
+
+type NavigatorWithDeviceMemory = Navigator & {
+    deviceMemory?: number;
+};
 
 const pageVariants = {
     initial: { opacity: 0, y: 18 },
@@ -44,7 +53,7 @@ const pageTransition = {
 
 function LoadingScreen({ onComplete, reduceMotion }: { onComplete: () => void; reduceMotion: boolean }) {
     useEffect(() => {
-        const timer = window.setTimeout(onComplete, reduceMotion ? 650 : 1450);
+        const timer = window.setTimeout(onComplete, reduceMotion ? 220 : 520);
         return () => window.clearTimeout(timer);
     }, [onComplete, reduceMotion]);
 
@@ -69,10 +78,10 @@ function LoadingScreen({ onComplete, reduceMotion }: { onComplete: () => void; r
                 transition={{ duration: reduceMotion ? 0.24 : 0.7, ease: ENTRY_EASE }}
                 className="relative z-10"
             >
-                <div className="relative mx-auto mb-7 h-20 w-20 md:h-24 md:w-24">
+                <div className="relative mx-auto mb-7 h-14 w-56 md:h-16 md:w-64">
                     <Image
-                        src="/logo-white.png"
-                        alt="Target"
+                        src="/logo-long-with-text.png"
+                        alt="Target International"
                         fill
                         className="object-contain drop-shadow-[0_0_32px_rgba(220,38,38,0.26)]"
                         priority
@@ -121,12 +130,54 @@ function LoadingScreen({ onComplete, reduceMotion }: { onComplete: () => void; r
 export default function Home() {
     const [activeTab, setActiveTab] = useState("home");
     const [isLoading, setIsLoading] = useState(true);
-    const reduceMotion = useReducedMotion() ?? false;
+    const [autoReduceMotion] = useState(() => {
+        if (typeof navigator === "undefined") {
+            return false;
+        }
+
+        const navigatorWithDeviceMemory = navigator as NavigatorWithDeviceMemory;
+        const cores = navigator.hardwareConcurrency ?? 8;
+        const memory = navigatorWithDeviceMemory.deviceMemory ?? 8;
+        return cores <= 4 || memory <= 4;
+    });
+    const reduceMotionPreference = useReducedMotion() ?? false;
+    const reduceMotion = reduceMotionPreference || autoReduceMotion;
     const activePageVariants = reduceMotion ? reducedPageVariants : pageVariants;
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
     }, [activeTab, reduceMotion]);
+
+    useEffect(() => {
+        if (isLoading) {
+            return;
+        }
+
+        // Preload only the most-used tabs in a staggered way to avoid a large CPU/network burst.
+        const timer = window.setTimeout(() => {
+            let preloadIndex = 0;
+
+            const preloadNext = () => {
+                const preload = lightweightPreloaders[preloadIndex];
+                if (!preload) {
+                    return;
+                }
+
+                void preload();
+                preloadIndex += 1;
+
+                if (preloadIndex < lightweightPreloaders.length) {
+                    window.setTimeout(preloadNext, reduceMotion ? 90 : 180);
+                }
+            };
+
+            preloadNext();
+        }, reduceMotion ? 140 : 360);
+
+        return () => {
+            window.clearTimeout(timer);
+        };
+    }, [isLoading, reduceMotion]);
 
     const renderContent = () => {
         switch (activeTab) {
@@ -145,6 +196,8 @@ export default function Home() {
                         <Guidelines />
                         <ROICalculator />
                         <AlumniCarousel />
+                        <RouteMap />
+                        <CampusLife />
                     </motion.div>
                 );
             case "programs":
@@ -152,31 +205,14 @@ export default function Home() {
                     <motion.div key="programs" variants={activePageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
                         <PathwayQuiz setActiveTab={setActiveTab} />
                         <Programs setActiveTab={setActiveTab} />
-                    </motion.div>
-                );
-            case "german":
-                return (
-                    <motion.div key="german" variants={activePageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
                         <GermanCourses />
-                    </motion.div>
-                );
-            case "opportunities":
-                return (
-                    <motion.div key="opportunities" variants={activePageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
                         <Opportunities />
                     </motion.div>
                 );
-            case "campus":
+            case "contact":
                 return (
-                    <motion.div key="campus" variants={activePageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
-                        <RouteMap />
-                        <CampusLife />
-                    </motion.div>
-                );
-            case "admissions":
-                return (
-                    <motion.div key="admissions" variants={activePageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
-                        <Admissions />
+                    <motion.div key="contact" variants={activePageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
+                        <ContactUs />
                     </motion.div>
                 );
             default:

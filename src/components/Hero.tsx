@@ -295,7 +295,7 @@ export default function Hero({ setActiveTab }: { setActiveTab?: (tab: string) =>
                         alt="Berlin, Germany"
                         fill
                         priority
-                        quality={84}
+                        quality={76}
                         sizes="100vw"
                         className="object-cover object-center"
                     />
@@ -395,7 +395,7 @@ export default function Hero({ setActiveTab }: { setActiveTab?: (tab: string) =>
                 >
                     <motion.button
                         type="button"
-                        onClick={() => changeTab("admissions")}
+                        onClick={() => changeTab("contact")}
                         whileHover={{ scale: 1.03, boxShadow: "0 20px 60px rgba(239, 68, 68, 0.45)" }}
                         whileTap={{ scale: 0.98 }}
                         className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-red-600 via-red-500 to-red-600 px-8 py-4 text-sm font-bold text-white shadow-[0_16px_40px_rgba(220,38,38,0.38)] transition-all duration-300 sm:px-10"

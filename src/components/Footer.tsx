@@ -1,10 +1,11 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Facebook, Instagram, Linkedin, Mail, MapPin, Phone, Send, Youtube } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { Link } from "@/i18n/routing";
 
 type SocialItem = {
     label: string;
@@ -32,15 +33,33 @@ const staggerItem = {
 
 export default function Footer({ setActiveTab }: { setActiveTab?: (t: string) => void }) {
     const t = useTranslations("Footer");
+    const navT = useTranslations("Navbar");
+    const locale = useLocale();
+    const currentYear = new Date().getFullYear();
+    const legalCopy = locale === "de"
+        ? {
+            imprint: "Impressum",
+            cookieSettings: "Cookie-Einstellungen",
+            legalLine: "Datenschutz, Nutzungsbedingungen und Impressum sind jederzeit einsehbar.",
+            pathwayLine: "Germany Pathway und Admissions Support",
+        }
+        : {
+            imprint: "Impressum",
+            cookieSettings: "Cookie Settings",
+            legalLine: "Privacy, terms, and legal notice are always available.",
+            pathwayLine: "Germany pathway and admissions support",
+        };
+    const contactLabel = locale === "de" ? "Kontakt" : "Contact";
+    const ctaLabel = locale === "de" ? "Kontakt aufnehmen" : "Contact Us";
 
     const navSections = [
         {
             title: t("quickLinks"),
             links: [
-                { label: t("programs"), tab: "programs" },
-                { label: t("germanCourses"), tab: "german" },
-                { label: t("opportunities"), tab: "opportunities" },
-                { label: t("admissions"), tab: "admissions" },
+                { label: navT("home"), tab: "home" },
+                { label: navT("about"), tab: "about" },
+                { label: navT("programs"), tab: "programs" },
+                { label: contactLabel, tab: "contact" },
             ],
         },
     ];
@@ -50,6 +69,10 @@ export default function Footer({ setActiveTab }: { setActiveTab?: (t: string) =>
             setActiveTab(tab);
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
+    };
+
+    const openCookieSettings = () => {
+        window.dispatchEvent(new Event("open-cookie-preferences"));
     };
 
     return (
@@ -68,10 +91,10 @@ export default function Footer({ setActiveTab }: { setActiveTab?: (t: string) =>
                 >
                     <motion.div variants={staggerItem} className="rounded-[28px] border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015))] p-6 md:p-7">
                         <button onClick={() => jumpTo("home")} className="group flex cursor-pointer items-center gap-3 text-left">
-                            <div className="relative h-10 w-10 overflow-hidden rounded-[10px]">
-                                <Image src="/logo.jpg" alt="Logo" fill className="object-cover" />
+                            <div className="relative h-10 w-44 overflow-hidden">
+                                <Image src="/logo-long-with-text.png" alt="Target International" fill className="object-contain object-left" />
                             </div>
-                            <div className="flex flex-col items-start">
+                            <div className="hidden flex-col items-start md:flex">
                                 <span className="font-[family-name:var(--font-outfit)] text-lg font-black leading-none tracking-tight text-white">Target International</span>
                                 <span className="mt-1 text-[9px] font-semibold uppercase tracking-[0.24em] text-white/28">Tashkent to Germany pathway</span>
                             </div>
@@ -167,17 +190,48 @@ export default function Footer({ setActiveTab }: { setActiveTab?: (t: string) =>
                     <motion.button
                         whileHover={{ scale: 1.02, boxShadow: "0 8px 30px rgba(220,38,38,0.28)" }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={() => jumpTo("admissions")}
+                        onClick={() => jumpTo("contact")}
                         className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-red-600 to-red-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_8px_26px_rgba(220,38,38,0.22)]"
                     >
-                        Apply Now
+                        {ctaLabel}
                         <ArrowUpRight className="h-4 w-4" />
                     </motion.button>
                 </motion.div>
 
-                <div className="mt-6 flex flex-col gap-2 border-t border-white/6 pt-4 text-xs text-white/24 md:flex-row md:items-center md:justify-between">
-                    <span>Target International</span>
-                    <span>Germany pathway and admissions support</span>
+                <div className="mt-6 rounded-[24px] border border-white/8 bg-white/[0.02] p-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                        <Link
+                            href="/privacy"
+                            className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-1.5 text-xs font-semibold text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white"
+                        >
+                            {t("privacy")}
+                        </Link>
+                        <Link
+                            href="/terms"
+                            className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-1.5 text-xs font-semibold text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white"
+                        >
+                            {t("terms")}
+                        </Link>
+                        <Link
+                            href="/impressum"
+                            className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-1.5 text-xs font-semibold text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white"
+                        >
+                            {legalCopy.imprint}
+                        </Link>
+                        <button
+                            type="button"
+                            onClick={openCookieSettings}
+                            className="rounded-full border border-white/12 bg-white/[0.03] px-3 py-1.5 text-xs font-semibold text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white"
+                        >
+                            {legalCopy.cookieSettings}
+                        </button>
+                    </div>
+                    <p className="mt-3 text-xs leading-6 text-white/36">{legalCopy.legalLine}</p>
+                </div>
+
+                <div className="mt-5 flex flex-col gap-2 border-t border-white/6 pt-4 text-xs text-white/28 md:flex-row md:items-center md:justify-between">
+                    <span>{`(c) ${currentYear} ${t("rights")}`}</span>
+                    <span>{legalCopy.pathwayLine}</span>
                 </div>
             </div>
         </footer>

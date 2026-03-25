@@ -143,7 +143,7 @@ function ProgramCard({ program, idx, isExpanded, onToggle, t, setActiveTab }: { 
                                     </motion.div>
                                 ))}
                             </div>
-                            <motion.button onClick={() => { if (setActiveTab) setActiveTab('admissions'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} whileHover={{ x: 5 }} className="flex items-center gap-2 text-red-400 font-semibold text-sm">{t("learnMore")} <ArrowRight className="w-4 h-4" /></motion.button>
+                            <motion.button onClick={() => { if (setActiveTab) setActiveTab('contact'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} whileHover={{ x: 5 }} className="flex items-center gap-2 text-red-400 font-semibold text-sm">{t("learnMore")} <ArrowRight className="w-4 h-4" /></motion.button>
                         </div>
                     </motion.div>
                 )}

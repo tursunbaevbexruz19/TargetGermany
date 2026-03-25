@@ -13,7 +13,6 @@ const LOCALES = [
     { code: "de", label: "Deutsch" },
     { code: "uz", label: "Uzbek" },
     { code: "ru", label: "Russian" },
-    { code: "fr", label: "French" },
     { code: "es", label: "Spanish" },
     { code: "ar", label: "Arabic" },
     { code: "zh", label: "Chinese" },
@@ -23,8 +22,10 @@ const LOCALES = [
 
 export default function Navbar({ activeTab = "home", setActiveTab }: { activeTab?: string; setActiveTab?: (t: string) => void }) {
     const t = useTranslations("Navbar");
+    const currentLocale = useLocale();
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const contactLabel = currentLocale === "de" ? "Kontakt" : "Contact";
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -36,9 +37,7 @@ export default function Navbar({ activeTab = "home", setActiveTab }: { activeTab
         { id: "home", label: t("home") },
         { id: "about", label: t("about") },
         { id: "programs", label: t("programs") },
-        { id: "german", label: t("german") },
-        { id: "opportunities", label: t("opportunities") },
-        { id: "campus", label: t("campus") },
+        { id: "contact", label: contactLabel },
     ];
 
     return (
@@ -53,8 +52,8 @@ export default function Navbar({ activeTab = "home", setActiveTab }: { activeTab
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center justify-between">
                     <button onClick={() => { if (setActiveTab) setActiveTab("home"); }} className="group relative z-50 flex cursor-pointer items-center gap-3">
-                        <div className="relative h-12 w-12 overflow-hidden md:h-14 md:w-14">
-                            <Image src="/logo-white.png" alt="Target International School" fill className="object-contain" priority />
+                        <div className="relative h-12 w-52 overflow-hidden md:h-14 md:w-64">
+                            <Image src="/logo-long-with-text.png" alt="Target International School" fill className="object-contain object-left" priority />
                         </div>
                     </button>
 
@@ -84,7 +83,7 @@ export default function Navbar({ activeTab = "home", setActiveTab }: { activeTab
                         <LanguageSwitcher />
                         <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                             <button
-                                onClick={() => { if (setActiveTab) setActiveTab("admissions"); }}
+                                onClick={() => { if (setActiveTab) setActiveTab("contact"); }}
                                 className="rounded-full bg-gradient-to-r from-red-600 to-red-500 px-6 py-2.5 text-sm font-semibold text-white shadow-[0_0_20px_rgba(220,38,38,0.25)] transition-all duration-300 hover:from-red-500 hover:to-red-400 hover:shadow-[0_0_30px_rgba(220,38,38,0.4)]"
                             >
                                 {t("applyNow")}
@@ -143,7 +142,7 @@ export default function Navbar({ activeTab = "home", setActiveTab }: { activeTab
                             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-4 border-t border-white/10 pt-6">
                                 <button
                                     onClick={() => {
-                                        if (setActiveTab) setActiveTab("admissions");
+                                        if (setActiveTab) setActiveTab("contact");
                                         setIsMobileMenuOpen(false);
                                     }}
                                     className="block w-full rounded-full bg-gradient-to-r from-red-600 to-red-500 px-8 py-4 text-center text-lg font-bold text-white shadow-[0_0_30px_rgba(220,38,38,0.25)]"

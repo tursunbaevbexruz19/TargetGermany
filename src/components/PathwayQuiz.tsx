@@ -193,7 +193,7 @@ export default function PathwayQuiz({ setActiveTab }: { setActiveTab?: (t: strin
                                     <button onClick={resetQuiz} className="flex items-center gap-2 text-white/40 hover:text-white/80 transition-colors text-sm font-semibold">
                                         <RotateCcw className="w-4 h-4" /> {t("retake")}
                                     </button>
-                                    <button onClick={() => { if (setActiveTab) { setActiveTab('admissions'); return; } document.getElementById('admissions')?.scrollIntoView({ behavior: 'smooth' }); }} className="group px-8 py-3.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold transition-all shadow-[0_0_20px_rgba(220,38,38,0.3)] flex items-center gap-2">
+                                    <button onClick={() => { if (setActiveTab) { setActiveTab('contact'); return; } document.getElementById('contact-us')?.scrollIntoView({ behavior: 'smooth' }); }} className="group px-8 py-3.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold transition-all shadow-[0_0_20px_rgba(220,38,38,0.3)] flex items-center gap-2">
                                         {t("applyCta")}
                                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                     </button>

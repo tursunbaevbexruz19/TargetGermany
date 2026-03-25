@@ -37,7 +37,7 @@ function getNested(obj, path) {
 // For each non-English locale, ensure it has all the same keys.
 // Keep existing values where they exist and match the new structure.
 // For missing keys, copy English.
-const localeFiles = ['de', 'uz', 'ru', 'fr', 'es', 'ar', 'zh', 'ko', 'tr'];
+const localeFiles = ['de', 'uz', 'ru', 'es', 'ar', 'zh', 'ko', 'tr'];
 const enKeys = getKeys(en);
 
 for (const locale of localeFiles) {
