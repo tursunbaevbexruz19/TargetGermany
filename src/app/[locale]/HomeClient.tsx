@@ -127,7 +127,7 @@ function LoadingScreen({ onComplete, reduceMotion }: { onComplete: () => void; r
     );
 }
 
-export default function HomeClient({ heroData }: { heroData: any }) {
+export default function HomeClient({ heroData, coursesData }: { heroData: any; coursesData?: any[] }) {
     const [activeTab, setActiveTab] = useState("home");
     const [isLoading, setIsLoading] = useState(true);
     const [autoReduceMotion] = useState(() => {
@@ -204,7 +204,7 @@ export default function HomeClient({ heroData }: { heroData: any }) {
                     <motion.div key="programs" variants={activePageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
                         <PathwayQuiz setActiveTab={setActiveTab} />
                         <Programs setActiveTab={setActiveTab} />
-                        <GermanCourses />
+                        <GermanCourses dynamicCourses={coursesData} />
                         <Opportunities />
                     </motion.div>
                 );

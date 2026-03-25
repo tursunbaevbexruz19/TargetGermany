@@ -27,16 +27,37 @@ type CourseType = {
     highlight: boolean;
 };
 
-export default function GermanCourses() {
+export default function GermanCourses({ dynamicCourses }: { dynamicCourses?: any[] }) {
     const t = useTranslations("German");
     const [activeLevel, setActiveLevel] = useState(0);
     const [activeFilter, setActiveFilter] = useState<CourseFilter>("all");
 
-    const courseTypes: CourseType[] = [
-        { id: "int1", type: "intensive", title: t("intensiveCourse"), desc: t("intensiveDesc"), hours: 20, weeks: 8, icon: TrendingUp, highlight: false },
-        { id: "int2", type: "intensive", title: t("superIntensive"), desc: t("superIntensiveDesc"), hours: 30, weeks: 6, icon: Zap, highlight: true },
-        { id: "eve1", type: "evening", title: t("eveningCourse"), desc: t("eveningDesc"), hours: 8, weeks: 14, icon: Clock, highlight: false },
-    ];
+    // Mapping icon fields from Sanity to Lucide icons
+    const iconMap: Record<string, LucideIcon> = {
+        math: TrendingUp,
+        science: Zap,
+        globe: BookOpen,
+        book: Award,
+    };
+
+    const courseTypes: CourseType[] = dynamicCourses && dynamicCourses.length > 0 
+        ? dynamicCourses.map((c: any) => ({
+            id: c._id,
+            type: c.levels ? (c.levels.toLowerCase().includes("evening") ? "evening" : "intensive") : "intensive",
+            title: c.title,
+            desc: c.description,
+            hours: parseInt(c.duration?.match(/\d+/)?.[0] || "0"), // Heuristic extraction
+            weeks: parseInt(c.duration?.match(/\d+ Weeks/)?.[0]?.match(/\d+/)?.[0] || "0"),
+            icon: iconMap[c.iconType] || TrendingUp,
+            highlight: c.iconType === "science", // Logic based on icon for highlight
+            durationText: c.duration,
+            levelsText: c.levels
+        }))
+        : [
+            { id: "int1", type: "intensive", title: t("intensiveCourse"), desc: t("intensiveDesc"), hours: 20, weeks: 8, icon: TrendingUp, highlight: false },
+            { id: "int2", type: "intensive", title: t("superIntensive"), desc: t("superIntensiveDesc"), hours: 30, weeks: 6, icon: Zap, highlight: true },
+            { id: "eve1", type: "evening", title: t("eveningCourse"), desc: t("eveningDesc"), hours: 8, weeks: 14, icon: Clock, highlight: false },
+        ];
 
     const filters: Array<{ id: CourseFilter; label: string }> = [
         { id: "all", label: "All Formats" },
@@ -101,16 +122,33 @@ export default function GermanCourses() {
                                     {course.highlight && <div className="absolute -top-3 left-1/2 -translate-x-1/2"><span className="rounded-full bg-red-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg shadow-red-500/20">Most Popular</span></div>}
                                     <course.icon className={`mb-6 h-10 w-10 shrink-0 ${course.highlight ? "text-red-400" : "text-red-400/60"}`} />
                                     <h4 className="mb-2 text-xl font-bold text-white">{course.title}</h4>
+                                    
+                                    {(course as any).levelsText && (
+                                        <div className="mb-3 inline-flex items-center gap-2 rounded-lg bg-white/[0.04] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-red-400">
+                                            Levels: {(course as any).levelsText}
+                                        </div>
+                                    )}
+
                                     <p className="mb-8 flex-grow text-sm leading-relaxed text-white/40">{course.desc}</p>
+                                    
                                     <div className="flex shrink-0 items-end justify-between border-t border-white/[0.04] pt-4">
-                                        <div>
-                                            <div className="text-3xl font-black text-white">{course.hours}</div>
-                                            <div className="text-[10px] font-semibold uppercase tracking-wider text-white/30">{t("hoursPerWeek")}</div>
-                                        </div>
-                                        <div className="text-right">
-                                            <div className="text-3xl font-black text-white">{course.weeks}</div>
-                                            <div className="text-[10px] font-semibold uppercase tracking-wider text-white/30">{t("weeksPerLevel")}</div>
-                                        </div>
+                                        {(course as any).durationText ? (
+                                            <div>
+                                                <div className="text-xl font-black text-white">{(course as any).durationText}</div>
+                                                <div className="text-[10px] font-semibold uppercase tracking-wider text-white/30">Schedule</div>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div>
+                                                    <div className="text-3xl font-black text-white">{course.hours}</div>
+                                                    <div className="text-[10px] font-semibold uppercase tracking-wider text-white/30">{t("hoursPerWeek")}</div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="text-3xl font-black text-white">{course.weeks}</div>
+                                                    <div className="text-[10px] font-semibold uppercase tracking-wider text-white/30">{t("weeksPerLevel")}</div>
+                                                </div>
+                                            </>
+                                        )}
                                     </div>
                                 </motion.div>
                             ))}
