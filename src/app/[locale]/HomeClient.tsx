@@ -128,7 +128,14 @@ function LoadingScreen({ onComplete, reduceMotion }: { onComplete: () => void; r
 }
 
 export default function HomeClient({ heroData, coursesData }: { heroData: any; coursesData?: any[] }) {
-    const [activeTab, setActiveTab] = useState("home");
+    const validTabs = ["home", "about", "programs", "contact"];
+    const [activeTab, setActiveTabState] = useState(() => {
+        if (typeof window !== "undefined") {
+            const hash = window.location.hash.replace("#", "");
+            if (validTabs.includes(hash)) return hash;
+        }
+        return "home";
+    });
     const [isLoading, setIsLoading] = useState(true);
     const [autoReduceMotion] = useState(() => {
         if (typeof navigator === "undefined") {
@@ -143,6 +150,12 @@ export default function HomeClient({ heroData, coursesData }: { heroData: any; c
     const reduceMotionPreference = useReducedMotion() ?? false;
     const reduceMotion = reduceMotionPreference || autoReduceMotion;
     const activePageVariants = reduceMotion ? reducedPageVariants : pageVariants;
+
+    // Wrapper that also updates the URL hash
+    const setActiveTab = (tab: string) => {
+        setActiveTabState(tab);
+        window.history.replaceState(null, "", `#${tab}`);
+    };
 
     useEffect(() => {
         window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
