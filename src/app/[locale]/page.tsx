@@ -1,5 +1,6 @@
+import { draftMode } from 'next/headers'
 import HomeClient from './HomeClient'
-import { client } from '@/sanity/lib/client'
+import { client, previewClient } from '@/sanity/lib/client'
 import { urlFor } from '@/sanity/lib/image'
 
 interface PageProps {
@@ -12,13 +13,15 @@ export const revalidate = 30
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params
+  const dm = await draftMode()
+  const sanity = dm.isEnabled ? previewClient : client
 
   let heroData = null
   let coursesData = null
 
   try {
     // Fetch Hero
-    const heroResult = await client.fetch(
+    const heroResult = await sanity.fetch(
       `*[_type == "hero" && language == $locale][0]`,
       { locale }
     )
@@ -32,8 +35,8 @@ export default async function Page({ params }: PageProps) {
       }
     }
 
-    // Fetch Courses — full projection including image + portable text
-    const coursesResult = await client.fetch(
+    // Fetch Courses
+    const coursesResult = await sanity.fetch(
       `*[_type == "course" && language == $locale] | order(sortOrder asc, _createdAt asc) {
         _id,
         title,
@@ -82,10 +85,6 @@ export default async function Page({ params }: PageProps) {
   return <HomeClient heroData={heroData} coursesData={coursesData} />
 }
 
-/**
- * Server-side rich text to HTML converter for Sanity portable text blocks.
- * Keeps the bundle lean by avoiding client-side portable-text libraries.
- */
 function blocksToHtml(blocks: any[]): string {
   if (!blocks || !Array.isArray(blocks)) return ''
   return blocks

@@ -5,6 +5,8 @@ import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import CookieConsentMount from "@/components/CookieConsentMount";
+import { draftMode } from "next/headers";
+import SanityVisualEditing from "@/components/SanityVisualEditing";
 
 const isValidLocale = (value: string): value is (typeof routing.locales)[number] =>
     routing.locales.includes(value as (typeof routing.locales)[number]);
@@ -33,6 +35,7 @@ export default async function RootLayout({
     }
 
     const messages = await getMessages();
+    const dm = await draftMode();
 
     return (
         <html lang={locale} suppressHydrationWarning>
@@ -41,6 +44,7 @@ export default async function RootLayout({
                     {children}
                     <CookieConsentMount />
                 </NextIntlClientProvider>
+                {dm.isEnabled && <SanityVisualEditing />}
             </body>
         </html>
     );
