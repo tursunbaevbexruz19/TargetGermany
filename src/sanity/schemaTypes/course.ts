@@ -1,4 +1,16 @@
-import { defineType, defineField } from 'sanity'
+import { defineField, defineType } from 'sanity'
+
+const LANGUAGE_OPTIONS = [
+  { title: 'English', value: 'en' },
+  { title: 'Deutsch', value: 'de' },
+  { title: 'Uzbek', value: 'uz' },
+  { title: 'Russian', value: 'ru' },
+  { title: 'Spanish', value: 'es' },
+  { title: 'Arabic', value: 'ar' },
+  { title: 'Chinese', value: 'zh' },
+  { title: 'Korean', value: 'ko' },
+  { title: 'Turkish', value: 'tr' },
+]
 
 export const courseType = defineType({
   name: 'course',
@@ -7,9 +19,10 @@ export const courseType = defineType({
   fields: [
     defineField({
       name: 'title',
-      title: 'Course Title',
+      title: 'Course Title (Base/Fallback)',
       type: 'string',
       validation: (rule) => rule.required().min(3).max(120),
+      description: 'Used as fallback when a locale-specific translation is not filled.',
     }),
     defineField({
       name: 'slug',
@@ -27,18 +40,73 @@ export const courseType = defineType({
     }),
     defineField({
       name: 'shortDescription',
-      title: 'Short Description (shown on card)',
+      title: 'Short Description (Base/Fallback)',
       type: 'text',
       rows: 3,
       validation: (rule) => rule.required().max(200),
-      description: 'A brief summary displayed on the preview card before expanding.',
+      description: 'Base text used when a locale-specific translation is missing.',
     }),
     defineField({
       name: 'fullDescription',
-      title: 'Full Description (shown when expanded)',
+      title: 'Full Description (Base/Fallback)',
       type: 'array',
       of: [{ type: 'block' }],
-      description: 'Rich text with formatting. Shown when user clicks "Read More".',
+      description: 'Base rich text used when a locale-specific translation is missing.',
+    }),
+    defineField({
+      name: 'translations',
+      title: 'Multilingual Content',
+      type: 'object',
+      description:
+        'Add localized versions here for each site language. If a language is empty, the website falls back to legacy fields above.',
+      options: { collapsible: true, collapsed: false },
+      fields: LANGUAGE_OPTIONS.map((language) =>
+        defineField({
+          name: language.value,
+          title: language.title,
+          type: 'object',
+          options: { collapsible: true, collapsed: language.value !== 'en' },
+          fields: [
+            defineField({
+              name: 'title',
+              title: 'Course Title',
+              type: 'string',
+              validation: (rule) => rule.min(3).max(120),
+            }),
+            defineField({
+              name: 'shortDescription',
+              title: 'Short Description',
+              type: 'text',
+              rows: 3,
+              validation: (rule) => rule.max(200),
+            }),
+            defineField({
+              name: 'fullDescription',
+              title: 'Full Description',
+              type: 'array',
+              of: [{ type: 'block' }],
+            }),
+            defineField({
+              name: 'schedule',
+              title: 'Schedule Details',
+              type: 'string',
+              description: 'Example: Mon-Fri 09:00-13:00',
+            }),
+            defineField({
+              name: 'price',
+              title: 'Price',
+              type: 'string',
+            }),
+            defineField({
+              name: 'tags',
+              title: 'SEO Tags / Hashtags',
+              type: 'array',
+              of: [{ type: 'string' }],
+              options: { layout: 'tags' },
+            }),
+          ],
+        })
+      ),
     }),
     defineField({
       name: 'courseType',
@@ -131,19 +199,10 @@ export const courseType = defineType({
       title: 'Content Language',
       type: 'string',
       options: {
-        list: [
-          { title: 'English', value: 'en' },
-          { title: 'Deutsch', value: 'de' },
-          { title: 'Uzbek', value: 'uz' },
-          { title: 'Russian', value: 'ru' },
-          { title: 'Spanish', value: 'es' },
-          { title: 'Arabic', value: 'ar' },
-          { title: 'Chinese', value: 'zh' },
-          { title: 'Korean', value: 'ko' },
-          { title: 'Turkish', value: 'tr' },
-        ],
+        list: LANGUAGE_OPTIONS,
       },
       validation: (rule) => rule.required(),
+      description: 'Primary/base language for legacy workflow and translation fallback.',
     }),
     defineField({
       name: 'sortOrder',

@@ -37,20 +37,28 @@ export default async function Page({ params }: PageProps) {
 
     // Fetch Courses
     const coursesResult = await sanity.fetch(
-      `*[_type == "course" && language == $locale] | order(sortOrder asc, _createdAt asc) {
+      `*[
+        _type == "course" &&
+        (
+          language == $locale ||
+          defined(translations[$locale].title) ||
+          defined(translations[$locale].shortDescription) ||
+          defined(translations[$locale].fullDescription)
+        )
+      ] | order(sortOrder asc, _createdAt asc) {
         _id,
-        title,
-        shortDescription,
-        fullDescription,
+        "title": coalesce(translations[$locale].title, title),
+        "shortDescription": coalesce(translations[$locale].shortDescription, shortDescription),
+        "fullDescription": coalesce(translations[$locale].fullDescription, fullDescription),
         courseType,
         levels,
         hoursPerWeek,
         durationWeeks,
-        schedule,
-        price,
+        "schedule": coalesce(translations[$locale].schedule, schedule),
+        "price": coalesce(translations[$locale].price, price),
         isFeatured,
         iconType,
-        tags,
+        "tags": coalesce(translations[$locale].tags, tags),
         previewImage
       }`,
       { locale }
