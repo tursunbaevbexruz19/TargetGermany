@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -8,6 +8,12 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import PartnerMarquee from "@/components/PartnerMarquee";
+import type { SanityCourse } from "@/components/GermanCourses";
+import type { HeroDynamicData } from "@/components/Hero";
+import {
+    buildProgramMenu,
+    type ProgramMenuSelection,
+} from "@/lib/programMenu";
 
 const About = dynamic(() => import("@/components/About"), { ssr: false });
 const Comparison = dynamic(() => import("@/components/Comparison"), { ssr: false });
@@ -32,6 +38,12 @@ const lightweightPreloaders = [
 
 type NavigatorWithDeviceMemory = Navigator & {
     deviceMemory?: number;
+};
+
+type HomeClientCourse = SanityCourse;
+
+type ProgramMenuSelectionState = ProgramMenuSelection & {
+    nonce: number;
 };
 
 const pageVariants = {
@@ -127,7 +139,7 @@ function LoadingScreen({ onComplete, reduceMotion }: { onComplete: () => void; r
     );
 }
 
-export default function HomeClient({ heroData, coursesData }: { heroData: any; coursesData?: any[] }) {
+export default function HomeClient({ heroData, coursesData }: { heroData: HeroDynamicData | null; coursesData?: HomeClientCourse[] }) {
     const validTabs = ["home", "about", "programs", "contact"];
     const [activeTab, setActiveTabState] = useState(() => {
         if (typeof window !== "undefined") {
@@ -136,6 +148,7 @@ export default function HomeClient({ heroData, coursesData }: { heroData: any; c
         }
         return "home";
     });
+    const [programMenuSelection, setProgramMenuSelection] = useState<ProgramMenuSelectionState>({ nonce: 0 });
     const [isLoading, setIsLoading] = useState(true);
     const [autoReduceMotion] = useState(() => {
         if (typeof navigator === "undefined") {
@@ -150,11 +163,20 @@ export default function HomeClient({ heroData, coursesData }: { heroData: any; c
     const reduceMotionPreference = useReducedMotion() ?? false;
     const reduceMotion = reduceMotionPreference || autoReduceMotion;
     const activePageVariants = reduceMotion ? reducedPageVariants : pageVariants;
+    const programMenu = useMemo(() => buildProgramMenu(coursesData), [coursesData]);
 
     // Wrapper that also updates the URL hash
     const setActiveTab = (tab: string) => {
         setActiveTabState(tab);
         window.history.replaceState(null, "", `#${tab}`);
+    };
+
+    const handleProgramMenuSelect = (selection: ProgramMenuSelection) => {
+        setProgramMenuSelection((prev) => ({
+            ...selection,
+            nonce: prev.nonce + 1,
+        }));
+        setActiveTab("programs");
     };
 
     useEffect(() => {
@@ -196,7 +218,7 @@ export default function HomeClient({ heroData, coursesData }: { heroData: any; c
             case "home":
                 return (
                     <motion.div key="home" variants={activePageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
-                        <Hero setActiveTab={setActiveTab} dynamicData={heroData} />
+                        <Hero setActiveTab={setActiveTab} dynamicData={heroData ?? undefined} />
                         <PartnerMarquee />
                     </motion.div>
                 );
@@ -217,7 +239,12 @@ export default function HomeClient({ heroData, coursesData }: { heroData: any; c
                     <motion.div key="programs" variants={activePageVariants} initial="initial" animate="animate" exit="exit" transition={pageTransition}>
                         <PathwayQuiz setActiveTab={setActiveTab} />
                         <Programs setActiveTab={setActiveTab} />
-                        <GermanCourses dynamicCourses={coursesData} />
+                        <GermanCourses
+                            dynamicCourses={coursesData}
+                            selectedCategoryId={programMenuSelection.categoryId}
+                            selectedCourseId={programMenuSelection.courseId}
+                            selectionToken={programMenuSelection.nonce}
+                        />
                         <Opportunities />
                     </motion.div>
                 );
@@ -244,7 +271,12 @@ export default function HomeClient({ heroData, coursesData }: { heroData: any; c
                 transition={{ duration: reduceMotion ? 0.18 : 0.36, delay: reduceMotion ? 0 : 0.08 }}
                 className="w-full"
             >
-                <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+                <Navbar
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                    programMenu={programMenu}
+                    onProgramMenuSelect={handleProgramMenuSelect}
+                />
 
                 <div className={`relative z-10 flex min-h-screen w-full flex-grow flex-col justify-between ${activeTab === "home" ? "pt-0" : "pt-24"}`}>
                     <div className="flex-grow">

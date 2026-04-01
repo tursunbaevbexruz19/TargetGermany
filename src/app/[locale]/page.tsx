@@ -9,6 +9,42 @@ interface PageProps {
   }>
 }
 
+interface PortableTextSpan {
+  text?: string
+  marks?: string[]
+}
+
+interface PortableTextBlock {
+  _type?: string
+  style?: string
+  children?: PortableTextSpan[]
+}
+
+interface FetchedCourse {
+  _id: string
+  title: string
+  menuLabel?: string
+  menuOrder?: number
+  sortOrder?: number
+  programCategory?: {
+    _id: string
+    title: string
+    sortOrder?: number
+  } | null
+  shortDescription: string
+  fullDescription?: PortableTextBlock[]
+  courseType: string
+  levels?: string[]
+  hoursPerWeek?: number
+  durationWeeks?: number
+  schedule?: string
+  price?: string
+  isFeatured?: boolean
+  iconType?: string
+  tags?: string[]
+  previewImage?: unknown
+}
+
 export const revalidate = 30
 
 export default async function Page({ params }: PageProps) {
@@ -48,9 +84,17 @@ export default async function Page({ params }: PageProps) {
       ] | order(sortOrder asc, _createdAt asc) {
         _id,
         "title": coalesce(translations[$locale].title, title),
+        "menuLabel": coalesce(translations[$locale].menuLabel, menuLabel, translations[$locale].title, title),
         "shortDescription": coalesce(translations[$locale].shortDescription, shortDescription),
         "fullDescription": coalesce(translations[$locale].fullDescription, fullDescription),
         courseType,
+        menuOrder,
+        sortOrder,
+        "programCategory": programCategory->{
+          _id,
+          title,
+          sortOrder
+        },
         levels,
         hoursPerWeek,
         durationWeeks,
@@ -65,9 +109,19 @@ export default async function Page({ params }: PageProps) {
     )
 
     if (coursesResult && coursesResult.length > 0) {
-      coursesData = coursesResult.map((course: any) => ({
+      coursesData = coursesResult.map((course: FetchedCourse) => ({
         _id: course._id,
         title: course.title,
+        menuLabel: course.menuLabel,
+        menuOrder: course.menuOrder,
+        sortOrder: course.sortOrder,
+        programCategory: course.programCategory
+          ? {
+              _id: course.programCategory._id,
+              title: course.programCategory.title,
+              sortOrder: course.programCategory.sortOrder ?? 0,
+            }
+          : null,
         shortDescription: course.shortDescription,
         fullDescriptionHtml: course.fullDescription
           ? blocksToHtml(course.fullDescription)
@@ -93,13 +147,13 @@ export default async function Page({ params }: PageProps) {
   return <HomeClient heroData={heroData} coursesData={coursesData} />
 }
 
-function blocksToHtml(blocks: any[]): string {
+function blocksToHtml(blocks: PortableTextBlock[]): string {
   if (!blocks || !Array.isArray(blocks)) return ''
   return blocks
-    .map((block: any) => {
+    .map((block: PortableTextBlock) => {
       if (block._type !== 'block' || !block.children) return ''
       const text = block.children
-        .map((child: any) => {
+        .map((child: PortableTextSpan) => {
           let t = child.text || ''
           if (child.marks?.includes('strong')) t = `<strong>${t}</strong>`
           if (child.marks?.includes('em')) t = `<em>${t}</em>`

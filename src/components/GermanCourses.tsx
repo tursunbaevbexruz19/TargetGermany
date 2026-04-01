@@ -1,16 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
-    Clock, BookOpen, Award, TrendingUp, Zap, Globe,
-    X, ChevronRight, Hash,
-    type LucideIcon
+    Clock,
+    BookOpen,
+    Award,
+    TrendingUp,
+    Zap,
+    Globe,
+    X,
+    ChevronRight,
+    Hash,
+    type LucideIcon,
 } from "lucide-react";
+import {
+    getCourseMenuCategory,
+    type ProgramCategorySummary,
+} from "@/lib/programMenu";
 
-/* ── CEFR Level bar ── */
 const LEVELS = [
     { key: "A1", pct: 16.6 },
     { key: "A2", pct: 33.3 },
@@ -22,7 +32,10 @@ const LEVELS = [
 
 type CourseFilter = "all" | "intensive" | "evening" | "weekend" | "online";
 
-/* ── Sanity Course shape ── */
+function isCourseFilter(value: string): value is Exclude<CourseFilter, "all"> {
+    return value === "intensive" || value === "evening" || value === "weekend" || value === "online";
+}
+
 export interface SanityCourse {
     _id: string;
     title: string;
@@ -38,6 +51,10 @@ export interface SanityCourse {
     iconType?: string;
     tags?: string[];
     imageUrl?: string;
+    menuLabel?: string;
+    menuOrder?: number;
+    sortOrder?: number;
+    programCategory?: ProgramCategorySummary | null;
 }
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -49,25 +66,6 @@ const ICON_MAP: Record<string, LucideIcon> = {
     award: Award,
 };
 
-/* ── Rich-text renderer (portable-text blocks → plain HTML) ── */
-function blocksToHtml(blocks: any[]): string {
-    if (!blocks || !Array.isArray(blocks)) return "";
-    return blocks
-        .map((block: any) => {
-            if (block._type !== "block" || !block.children) return "";
-            const text = block.children.map((c: any) => c.text).join("");
-            switch (block.style) {
-                case "h2": return `<h2 class="text-xl font-bold text-white mb-3 mt-5">${text}</h2>`;
-                case "h3": return `<h3 class="text-lg font-bold text-white/90 mb-2 mt-4">${text}</h3>`;
-                case "h4": return `<h4 class="text-base font-semibold text-white/80 mb-2 mt-3">${text}</h4>`;
-                case "blockquote": return `<blockquote class="border-l-2 border-red-500/40 pl-4 italic text-white/50 my-3">${text}</blockquote>`;
-                default: return `<p class="text-white/50 leading-relaxed mb-2">${text}</p>`;
-            }
-        })
-        .join("");
-}
-
-/* ── Expandable Detail Modal ── */
 function CourseDetailModal({ course, onClose }: { course: SanityCourse; onClose: () => void }) {
     const Icon = ICON_MAP[course.iconType || "book"] || BookOpen;
 
@@ -76,7 +74,7 @@ function CourseDetailModal({ course, onClose }: { course: SanityCourse; onClose:
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
             onClick={onClose}
         >
             <motion.div
@@ -87,7 +85,6 @@ function CourseDetailModal({ course, onClose }: { course: SanityCourse; onClose:
                 onClick={(e) => e.stopPropagation()}
                 className="relative max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-white/10 bg-[#0d1224] p-8 shadow-[0_25px_60px_rgba(0,0,0,0.6)] md:p-10"
             >
-                {/* Close button */}
                 <button
                     onClick={onClose}
                     className="absolute right-4 top-4 rounded-full bg-white/5 p-2 text-white/50 transition-colors hover:bg-white/10 hover:text-white"
@@ -95,7 +92,6 @@ function CourseDetailModal({ course, onClose }: { course: SanityCourse; onClose:
                     <X size={20} />
                 </button>
 
-                {/* Header with image */}
                 {course.imageUrl && (
                     <div className="relative mb-6 h-48 w-full overflow-hidden rounded-2xl md:h-56">
                         <Image
@@ -109,7 +105,6 @@ function CourseDetailModal({ course, onClose }: { course: SanityCourse; onClose:
                     </div>
                 )}
 
-                {/* Title + badge */}
                 <div className="mb-4 flex items-start gap-4">
                     <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-3">
                         <Icon className="h-7 w-7 text-red-400" />
@@ -124,7 +119,6 @@ function CourseDetailModal({ course, onClose }: { course: SanityCourse; onClose:
                     </div>
                 </div>
 
-                {/* Stats grid */}
                 <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
                     {course.hoursPerWeek && (
                         <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 text-center">
@@ -146,7 +140,6 @@ function CourseDetailModal({ course, onClose }: { course: SanityCourse; onClose:
                     )}
                 </div>
 
-                {/* Levels */}
                 {course.levels && course.levels.length > 0 && (
                     <div className="mb-6">
                         <div className="mb-2 text-[10px] font-bold uppercase tracking-wider text-white/30">CEFR Levels</div>
@@ -160,14 +153,12 @@ function CourseDetailModal({ course, onClose }: { course: SanityCourse; onClose:
                     </div>
                 )}
 
-                {/* Price */}
                 {course.price && (
                     <div className="mb-6 rounded-2xl border border-red-500/15 bg-red-500/[0.05] p-4 text-center">
                         <div className="text-2xl font-black text-white">{course.price}</div>
                     </div>
                 )}
 
-                {/* Full description */}
                 {course.fullDescriptionHtml && (
                     <div
                         className="prose prose-invert max-w-none"
@@ -175,7 +166,6 @@ function CourseDetailModal({ course, onClose }: { course: SanityCourse; onClose:
                     />
                 )}
 
-                {/* Tags */}
                 {course.tags && course.tags.length > 0 && (
                     <div className="mt-6 flex flex-wrap gap-2 border-t border-white/[0.06] pt-4">
                         {course.tags.map((tag) => (
@@ -191,21 +181,96 @@ function CourseDetailModal({ course, onClose }: { course: SanityCourse; onClose:
     );
 }
 
-/* ── Main Component ── */
-export default function GermanCourses({ dynamicCourses }: { dynamicCourses?: SanityCourse[] }) {
+type GermanCoursesProps = {
+    dynamicCourses?: SanityCourse[];
+    selectedCategoryId?: string;
+    selectedCourseId?: string;
+    selectionToken?: number;
+};
+
+export default function GermanCourses({
+    dynamicCourses,
+    selectedCategoryId,
+    selectedCourseId,
+    selectionToken,
+}: GermanCoursesProps) {
     const t = useTranslations("German");
+    const sectionRef = useRef<HTMLElement | null>(null);
     const [activeLevel, setActiveLevel] = useState(0);
     const [activeFilter, setActiveFilter] = useState<CourseFilter>("all");
+    const [activeMenuCategoryId, setActiveMenuCategoryId] = useState<string | null>(null);
     const [expandedCourse, setExpandedCourse] = useState<SanityCourse | null>(null);
 
-    /* Fallback static courses when Sanity has no data */
     const fallbackCourses: SanityCourse[] = [
-        { _id: "int1", title: t("intensiveCourse"), shortDescription: t("intensiveDesc"), courseType: "intensive", hoursPerWeek: 20, durationWeeks: 8, iconType: "trending", isFeatured: false },
-        { _id: "int2", title: t("superIntensive"), shortDescription: t("superIntensiveDesc"), courseType: "intensive", hoursPerWeek: 30, durationWeeks: 6, iconType: "zap", isFeatured: true },
-        { _id: "eve1", title: t("eveningCourse"), shortDescription: t("eveningDesc"), courseType: "evening", hoursPerWeek: 8, durationWeeks: 14, iconType: "clock", isFeatured: false },
+        {
+            _id: "int1",
+            title: t("intensiveCourse"),
+            shortDescription: t("intensiveDesc"),
+            courseType: "intensive",
+            hoursPerWeek: 20,
+            durationWeeks: 8,
+            iconType: "trending",
+            isFeatured: false,
+            programCategory: { _id: "fallback-german", title: "German Courses", sortOrder: 0 },
+        },
+        {
+            _id: "int2",
+            title: t("superIntensive"),
+            shortDescription: t("superIntensiveDesc"),
+            courseType: "intensive",
+            hoursPerWeek: 30,
+            durationWeeks: 6,
+            iconType: "zap",
+            isFeatured: true,
+            programCategory: { _id: "fallback-german", title: "German Courses", sortOrder: 0 },
+        },
+        {
+            _id: "eve1",
+            title: t("eveningCourse"),
+            shortDescription: t("eveningDesc"),
+            courseType: "evening",
+            hoursPerWeek: 8,
+            durationWeeks: 14,
+            iconType: "clock",
+            isFeatured: false,
+            programCategory: { _id: "fallback-german", title: "German Courses", sortOrder: 0 },
+        },
     ];
 
     const courses = dynamicCourses && dynamicCourses.length > 0 ? dynamicCourses : fallbackCourses;
+
+    const menuCategories = useMemo(() => {
+        const categories = new Map<string, { id: string; label: string; order: number }>();
+
+        for (const course of courses) {
+            const category = getCourseMenuCategory(course);
+            const existing = categories.get(category.id);
+            if (!existing || category.order < existing.order) {
+                categories.set(category.id, category);
+            }
+        }
+
+        return Array.from(categories.values()).sort((a, b) => {
+            if (a.order !== b.order) {
+                return a.order - b.order;
+            }
+
+            return a.label.localeCompare(b.label, undefined, { sensitivity: "base" });
+        });
+    }, [courses]);
+
+    const resolvedActiveMenuCategoryId =
+        activeMenuCategoryId && menuCategories.some((category) => category.id === activeMenuCategoryId)
+            ? activeMenuCategoryId
+            : null;
+
+    const categoryScopedCourses = useMemo(() => {
+        if (!resolvedActiveMenuCategoryId) {
+            return courses;
+        }
+
+        return courses.filter((course) => getCourseMenuCategory(course).id === resolvedActiveMenuCategoryId);
+    }, [resolvedActiveMenuCategoryId, courses]);
 
     const filterOptions: Array<{ id: CourseFilter; label: string }> = [
         { id: "all", label: "All Formats" },
@@ -215,27 +280,58 @@ export default function GermanCourses({ dynamicCourses }: { dynamicCourses?: San
         { id: "online", label: "Online" },
     ];
 
-    /* Only show filter buttons that have matching courses */
     const availableFilters = filterOptions.filter(
-        (f) => f.id === "all" || courses.some((c) => c.courseType === f.id)
+        (f) => f.id === "all" || categoryScopedCourses.some((c) => c.courseType === f.id)
     );
 
-    const filteredCourses = courses.filter((c) => activeFilter === "all" || c.courseType === activeFilter);
+    const resolvedActiveFilter =
+        activeFilter === "all" || availableFilters.some((filter) => filter.id === activeFilter)
+            ? activeFilter
+            : "all";
+
+    const filteredCourses = categoryScopedCourses.filter(
+        (c) => resolvedActiveFilter === "all" || c.courseType === resolvedActiveFilter
+    );
     const activeLevelKey = LEVELS[activeLevel].key;
 
+    /* eslint-disable react-hooks/set-state-in-effect */
+    useEffect(() => {
+        if (!selectionToken) {
+            return;
+        }
+
+        const selectedCourse = selectedCourseId
+            ? courses.find((course) => course._id === selectedCourseId)
+            : undefined;
+
+        if (selectedCourse) {
+            const category = getCourseMenuCategory(selectedCourse);
+            setActiveMenuCategoryId(category.id);
+            if (isCourseFilter(selectedCourse.courseType)) {
+                setActiveFilter(selectedCourse.courseType);
+            }
+            setExpandedCourse(selectedCourse);
+        } else if (selectedCategoryId) {
+            setActiveMenuCategoryId(selectedCategoryId);
+            setExpandedCourse(null);
+            setActiveFilter("all");
+        }
+
+        sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, [selectionToken, selectedCategoryId, selectedCourseId, courses]);
+    /* eslint-enable react-hooks/set-state-in-effect */
+
     return (
-        <section className="relative overflow-hidden bg-[#0a0f1e] py-28 md:py-40">
-            <div className="absolute left-0 top-1/4 h-[600px] w-[600px] rounded-full bg-red-600/[0.03] blur-[180px] pointer-events-none" />
+        <section ref={sectionRef} className="relative overflow-hidden bg-[#0a0f1e] py-28 md:py-40">
+            <div className="pointer-events-none absolute left-0 top-1/4 h-[600px] w-[600px] rounded-full bg-red-600/[0.03] blur-[180px]" />
 
             <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                {/* Section header */}
                 <motion.div initial={{ opacity: 0, y: 25 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-20 text-center">
                     <span className="mb-8 inline-block rounded-full border border-white/[0.08] bg-white/[0.04] px-5 py-2 text-[10px] font-bold uppercase tracking-[0.25em] text-white/50 md:text-xs">{t("sectionLabel")}</span>
                     <h2 className="mb-6 font-[family-name:var(--font-outfit)] text-3xl font-black tracking-[-0.02em] text-white sm:text-4xl md:text-5xl lg:text-6xl">{t("title")}</h2>
                     <p className="mx-auto max-w-2xl text-base leading-relaxed text-white/45 md:text-lg">{t("description")}</p>
                 </motion.div>
 
-                {/* CEFR Level Progress Bar */}
                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-20">
                     <div className="relative mb-8">
                         <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
@@ -260,14 +356,41 @@ export default function GermanCourses({ dynamicCourses }: { dynamicCourses?: San
                     </motion.div>
                 </motion.div>
 
-                {/* Course Format Filters + Cards */}
                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-20">
                     <h3 className="mb-6 text-center font-[family-name:var(--font-outfit)] text-2xl font-bold text-white md:text-3xl">Course Formats</h3>
+
+                    {menuCategories.length > 1 && (
+                        <div className="mb-6 flex flex-wrap justify-center gap-3">
+                            <button
+                                onClick={() => setActiveMenuCategoryId(null)}
+                                className={`rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-300 ${
+                                    resolvedActiveMenuCategoryId === null
+                                        ? "bg-red-500 text-white shadow-[0_4px_20px_rgba(239,68,68,0.3)]"
+                                        : "bg-white/[0.04] text-white/40 hover:bg-white/[0.08] hover:text-white"
+                                }`}
+                            >
+                                All Categories
+                            </button>
+                            {menuCategories.map((category) => (
+                                <button
+                                    key={category.id}
+                                    onClick={() => setActiveMenuCategoryId(category.id)}
+                                    className={`rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-300 ${
+                                        resolvedActiveMenuCategoryId === category.id
+                                            ? "bg-red-500 text-white shadow-[0_4px_20px_rgba(239,68,68,0.3)]"
+                                            : "bg-white/[0.04] text-white/40 hover:bg-white/[0.08] hover:text-white"
+                                    }`}
+                                >
+                                    {category.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
 
                     {availableFilters.length > 2 && (
                         <div className="mb-12 flex flex-wrap justify-center gap-3">
                             {availableFilters.map((filter) => (
-                                <button key={filter.id} onClick={() => setActiveFilter(filter.id)} className={`rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-300 ${activeFilter === filter.id ? "bg-red-500 text-white shadow-[0_4px_20px_rgba(239,68,68,0.3)]" : "bg-white/[0.04] text-white/40 hover:bg-white/[0.08] hover:text-white"}`}>
+                                <button key={filter.id} onClick={() => setActiveFilter(filter.id)} className={`rounded-full px-5 py-2.5 text-sm font-bold transition-all duration-300 ${resolvedActiveFilter === filter.id ? "bg-red-500 text-white shadow-[0_4px_20px_rgba(239,68,68,0.3)]" : "bg-white/[0.04] text-white/40 hover:bg-white/[0.08] hover:text-white"}`}>
                                     {filter.label}
                                 </button>
                             ))}
@@ -294,7 +417,6 @@ export default function GermanCourses({ dynamicCourses }: { dynamicCourses?: San
                                                 : "border-white/[0.06] bg-white/[0.02] hover:border-red-500/15 hover:bg-red-500/[0.04]"
                                         }`}
                                     >
-                                        {/* Featured badge */}
                                         {course.isFeatured && (
                                             <div className="absolute -top-0 right-4 z-10">
                                                 <span className="inline-block rounded-b-lg bg-red-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white shadow-lg shadow-red-500/20">
@@ -303,7 +425,6 @@ export default function GermanCourses({ dynamicCourses }: { dynamicCourses?: San
                                             </div>
                                         )}
 
-                                        {/* Preview image */}
                                         {course.imageUrl && (
                                             <div className="relative h-40 w-full overflow-hidden">
                                                 <Image
@@ -321,7 +442,6 @@ export default function GermanCourses({ dynamicCourses }: { dynamicCourses?: San
                                             <Icon className={`mb-4 h-9 w-9 shrink-0 ${course.isFeatured ? "text-red-400" : "text-red-400/60"}`} />
                                             <h4 className="mb-2 text-lg font-bold text-white">{course.title}</h4>
 
-                                            {/* Level badges */}
                                             {course.levels && course.levels.length > 0 && (
                                                 <div className="mb-3 flex flex-wrap gap-1.5">
                                                     {course.levels.map((lvl) => (
@@ -332,7 +452,6 @@ export default function GermanCourses({ dynamicCourses }: { dynamicCourses?: San
 
                                             <p className="mb-5 flex-grow text-sm leading-relaxed text-white/40">{course.shortDescription}</p>
 
-                                            {/* Tags */}
                                             {course.tags && course.tags.length > 0 && (
                                                 <div className="mb-4 flex flex-wrap gap-1.5">
                                                     {course.tags.slice(0, 3).map((tag) => (
@@ -344,14 +463,13 @@ export default function GermanCourses({ dynamicCourses }: { dynamicCourses?: San
                                                 </div>
                                             )}
 
-                                            {/* Stats footer */}
                                             <div className="flex shrink-0 items-end justify-between border-t border-white/[0.04] pt-4">
                                                 <div>
-                                                    <div className="text-2xl font-black text-white">{course.hoursPerWeek || "—"}</div>
+                                                    <div className="text-2xl font-black text-white">{course.hoursPerWeek || "-"}</div>
                                                     <div className="text-[10px] font-semibold uppercase tracking-wider text-white/30">{t("hoursPerWeek")}</div>
                                                 </div>
                                                 <div className="text-right">
-                                                    <div className="text-2xl font-black text-white">{course.durationWeeks || "—"}</div>
+                                                    <div className="text-2xl font-black text-white">{course.durationWeeks || "-"}</div>
                                                     <div className="text-[10px] font-semibold uppercase tracking-wider text-white/30">{t("weeksPerLevel")}</div>
                                                 </div>
                                                 <div className="flex items-center gap-1 text-xs font-semibold text-red-400 opacity-0 transition-opacity group-hover:opacity-100">
@@ -366,7 +484,6 @@ export default function GermanCourses({ dynamicCourses }: { dynamicCourses?: San
                     </motion.div>
                 </motion.div>
 
-                {/* Exam Prep Section */}
                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative overflow-hidden rounded-3xl border border-red-500/12 bg-gradient-to-r from-red-500/[0.07] via-red-900/[0.04] to-transparent p-8 md:p-12">
                     <div className="pointer-events-none absolute right-0 top-0 h-64 w-64 rounded-full bg-red-500/8 blur-[100px]" />
                     <div className="relative z-10 flex flex-col items-center gap-8 md:flex-row md:gap-12">
@@ -399,7 +516,6 @@ export default function GermanCourses({ dynamicCourses }: { dynamicCourses?: San
                 </motion.div>
             </div>
 
-            {/* Detail Modal */}
             <AnimatePresence>
                 {expandedCourse && (
                     <CourseDetailModal course={expandedCourse} onClose={() => setExpandedCourse(null)} />

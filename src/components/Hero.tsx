@@ -199,7 +199,17 @@ function InteractiveRoadmap() {
     );
 }
 
-export default function Hero({ setActiveTab, dynamicData }: { setActiveTab?: (tab: string) => void, dynamicData?: any }) {
+export type HeroDynamicData = {
+    badge?: string;
+    badgeText?: string;
+    title?: string;
+    titleLine1?: string;
+    titleLine2?: string;
+    description?: string;
+    primaryButton?: string;
+};
+
+export default function Hero({ setActiveTab, dynamicData }: { setActiveTab?: (tab: string) => void, dynamicData?: HeroDynamicData }) {
     const t = useTranslations("Hero");
     const navT = useTranslations("Navbar");
     const containerRef = useRef<HTMLDivElement>(null);
