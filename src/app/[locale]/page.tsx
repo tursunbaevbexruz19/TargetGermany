@@ -51,29 +51,8 @@ export default async function Page({ params }: PageProps) {
   const { locale } = await params
   const dm = await draftMode()
   const sanity = dm.isEnabled ? previewClient : client
-
-  let heroData = null
-  let coursesData = null
-
-  try {
-    // Fetch Hero
-    const heroResult = await sanity.fetch(
-      `*[_type == "hero" && language == $locale][0]`,
-      { locale }
-    )
-    if (heroResult) {
-      heroData = {
-        badge: heroResult.badge,
-        badgeText: heroResult.badge,
-        title: heroResult.title,
-        description: heroResult.description,
-        primaryButton: heroResult.ctaText,
-      }
-    }
-
-    // Fetch Courses
-    const coursesResult = await sanity.fetch(
-      `*[
+  const coursesQuery = `
+      *[
         _type == "course" &&
         (
           language == $locale ||
@@ -104,9 +83,34 @@ export default async function Page({ params }: PageProps) {
         iconType,
         "tags": coalesce(translations[$locale].tags, tags),
         previewImage
-      }`,
+      }
+    `
+
+  let heroData = null
+  let coursesData = null
+
+  try {
+    // Fetch Hero
+    const heroResult = await sanity.fetch(
+      `*[_type == "hero" && language == $locale][0]`,
       { locale }
     )
+    if (heroResult) {
+      heroData = {
+        badge: heroResult.badge,
+        badgeText: heroResult.badge,
+        title: heroResult.title,
+        description: heroResult.description,
+        primaryButton: heroResult.ctaText,
+      }
+    }
+
+    // Fetch Courses (with fallback locale so navbar submenu is always populated)
+    let coursesResult: FetchedCourse[] = await sanity.fetch(coursesQuery, { locale })
+
+    if ((!coursesResult || coursesResult.length === 0) && locale !== 'en') {
+      coursesResult = await sanity.fetch(coursesQuery, { locale: 'en' })
+    }
 
     if (coursesResult && coursesResult.length > 0) {
       coursesData = coursesResult.map((course: FetchedCourse) => ({
@@ -125,7 +129,7 @@ export default async function Page({ params }: PageProps) {
         shortDescription: course.shortDescription,
         fullDescriptionHtml: course.fullDescription
           ? blocksToHtml(course.fullDescription)
-          : null,
+          : undefined,
         courseType: course.courseType,
         levels: course.levels,
         hoursPerWeek: course.hoursPerWeek,
@@ -137,14 +141,14 @@ export default async function Page({ params }: PageProps) {
         tags: course.tags,
         imageUrl: course.previewImage
           ? urlFor(course.previewImage).width(800).height(500).format('webp').url()
-          : null,
+          : undefined,
       }))
     }
   } catch (err) {
     console.error('Error fetching data from Sanity:', err)
   }
 
-  return <HomeClient heroData={heroData} coursesData={coursesData} />
+  return <HomeClient heroData={heroData} coursesData={coursesData ?? undefined} />
 }
 
 function blocksToHtml(blocks: PortableTextBlock[]): string {

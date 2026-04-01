@@ -35,6 +35,19 @@ export interface ProgramMenuGroup {
   items: ProgramMenuItem[];
 }
 
+export const DEFAULT_PROGRAM_MENU: ProgramMenuGroup[] = [
+  {
+    id: "fallback-german",
+    label: "German Courses",
+    order: 0,
+    items: [
+      { id: "int1", courseId: "int1", label: "Intensive Course", order: 0 },
+      { id: "int2", courseId: "int2", label: "Super Intensive", order: 10 },
+      { id: "eve1", courseId: "eve1", label: "Evening Course", order: 20 },
+    ],
+  },
+];
+
 const DEFAULT_GROUP_ORDER = 9999;
 
 function toSortableNumber(value: number | null | undefined, fallback: number) {

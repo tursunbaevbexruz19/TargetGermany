@@ -12,6 +12,7 @@ import type { SanityCourse } from "@/components/GermanCourses";
 import type { HeroDynamicData } from "@/components/Hero";
 import {
     buildProgramMenu,
+    DEFAULT_PROGRAM_MENU,
     type ProgramMenuSelection,
 } from "@/lib/programMenu";
 
@@ -163,7 +164,10 @@ export default function HomeClient({ heroData, coursesData }: { heroData: HeroDy
     const reduceMotionPreference = useReducedMotion() ?? false;
     const reduceMotion = reduceMotionPreference || autoReduceMotion;
     const activePageVariants = reduceMotion ? reducedPageVariants : pageVariants;
-    const programMenu = useMemo(() => buildProgramMenu(coursesData), [coursesData]);
+    const programMenu = useMemo(() => {
+        const menu = buildProgramMenu(coursesData);
+        return menu.length > 0 ? menu : DEFAULT_PROGRAM_MENU;
+    }, [coursesData]);
 
     // Wrapper that also updates the URL hash
     const setActiveTab = (tab: string) => {

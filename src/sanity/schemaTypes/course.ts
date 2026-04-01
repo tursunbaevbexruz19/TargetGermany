@@ -140,7 +140,7 @@ export const courseType = defineType({
       validation: (rule) =>
         rule.required().error("Please choose a Program Category for this course."),
       description:
-        "Select the first-level submenu this course belongs to under Programs/Angebote.",
+        "Step 2: choose the first-level submenu for this course (created in Program Categories).",
     }),
     defineField({
       name: "menuLabel",
@@ -148,7 +148,7 @@ export const courseType = defineType({
       type: "string",
       validation: (rule) => rule.max(120),
       description:
-        "Optional short label for Programs submenu. Falls back to Course Title.",
+        "Step 3 (optional): short label shown in submenu. If empty, Course Title is used.",
     }),
     defineField({
       name: "menuOrder",
@@ -156,7 +156,7 @@ export const courseType = defineType({
       type: "number",
       initialValue: 0,
       description:
-        "Controls order inside the selected Program Category. Lower numbers appear first.",
+        "Step 4: controls order inside selected Program Category. Lower numbers appear first.",
     }),
     defineField({
       name: "levels",
