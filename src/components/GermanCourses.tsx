@@ -40,6 +40,7 @@ export interface SanityCourse {
     _id: string;
     title: string;
     shortDescription: string;
+    imageAlt?: string;
     seoMetaDescription?: string;
     fullDescriptionHtml?: string;
     courseType: string;
@@ -97,7 +98,7 @@ function CourseDetailModal({ course, onClose }: { course: SanityCourse; onClose:
                     <div className="relative mb-6 h-48 w-full overflow-hidden rounded-2xl md:h-56">
                         <Image
                             src={course.imageUrl}
-                            alt={course.title}
+                            alt={course.imageAlt || course.title}
                             fill
                             className="object-cover"
                             sizes="(max-width: 768px) 100vw, 640px"
@@ -430,7 +431,7 @@ export default function GermanCourses({
                                             <div className="relative h-40 w-full overflow-hidden">
                                                 <Image
                                                     src={course.imageUrl}
-                                                    alt={course.title}
+                                                    alt={course.imageAlt || course.title}
                                                     fill
                                                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                                                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

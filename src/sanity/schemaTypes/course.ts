@@ -56,8 +56,21 @@ export const courseType = defineType({
       title: "Preview Image (thumbnail shown on card)",
       type: "image",
       options: { hotspot: true },
+      fields: [
+        defineField({
+          name: "alt",
+          title: "Image Alt Text (SEO)",
+          type: "string",
+          validation: (rule) => [
+            rule.required().error("Please add alt text for better SEO and accessibility."),
+            rule.max(120).warning("Keep alt text concise (usually <= 120 characters)."),
+          ],
+          description:
+            'Important for SEO and accessibility. Example: "Deutsch A1.1 Intensivkurs".',
+        }),
+      ],
       description:
-        "Upload a small preview image for the course card. Recommended: 600x400px.",
+        "Upload a small preview image for the course card. Recommended: 600x400px. Then fill the Image Alt Text below it.",
       group: "content",
     }),
     defineField({
@@ -126,6 +139,14 @@ export const courseType = defineType({
               type: "text",
               rows: 3,
               validation: (rule) => rule.max(200),
+            }),
+            defineField({
+              name: "imageAlt",
+              title: "Image Alt Text",
+              type: "string",
+              validation: (rule) => rule.max(120),
+              description:
+                "Optional locale-specific image alt text. If empty, base image alt text is used.",
             }),
             defineField({
               name: "seoMetaDescription",
