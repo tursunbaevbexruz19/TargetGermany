@@ -40,6 +40,7 @@ export interface SanityCourse {
     _id: string;
     title: string;
     shortDescription: string;
+    seoMetaDescription?: string;
     fullDescriptionHtml?: string;
     courseType: string;
     levels?: string[];

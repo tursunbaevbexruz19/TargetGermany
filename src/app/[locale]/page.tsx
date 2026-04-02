@@ -24,6 +24,7 @@ interface FetchedCourse {
   _id: string
   title: string
   menuLabel?: string
+  seoMetaDescription?: string
   menuOrder?: number
   sortOrder?: number
   programCategory?: {
@@ -64,6 +65,7 @@ export default async function Page({ params }: PageProps) {
         _id,
         "title": coalesce(translations[$locale].title, title),
         "menuLabel": coalesce(translations[$locale].menuLabel, menuLabel, translations[$locale].title, title),
+        "seoMetaDescription": coalesce(translations[$locale].seoMetaDescription, seoMetaDescription),
         "shortDescription": coalesce(translations[$locale].shortDescription, shortDescription),
         "fullDescription": coalesce(translations[$locale].fullDescription, fullDescription),
         courseType,
@@ -117,6 +119,7 @@ export default async function Page({ params }: PageProps) {
         _id: course._id,
         title: course.title,
         menuLabel: course.menuLabel,
+        seoMetaDescription: course.seoMetaDescription,
         menuOrder: course.menuOrder,
         sortOrder: course.sortOrder,
         programCategory: course.programCategory
