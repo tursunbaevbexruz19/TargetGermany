@@ -64,12 +64,36 @@ export default async function Page({ params }: PageProps) {
         )
       ] | order(sortOrder asc, _createdAt asc) {
         _id,
-        "title": coalesce(translations[$locale].title, title),
-        "menuLabel": coalesce(translations[$locale].menuLabel, menuLabel, translations[$locale].title, title),
-        "imageAlt": coalesce(translations[$locale].imageAlt, previewImage.alt, translations[$locale].title, title),
-        "seoMetaDescription": coalesce(translations[$locale].seoMetaDescription, seoMetaDescription),
-        "shortDescription": coalesce(translations[$locale].shortDescription, shortDescription),
-        "fullDescription": coalesce(translations[$locale].fullDescription, fullDescription),
+        "title": select(
+          defined(translations[$locale].title) && length(translations[$locale].title) > 0 => translations[$locale].title,
+          title
+        ),
+        "menuLabel": select(
+          defined(translations[$locale].menuLabel) && length(translations[$locale].menuLabel) > 0 => translations[$locale].menuLabel,
+          defined(menuLabel) && length(menuLabel) > 0 => menuLabel,
+          defined(translations[$locale].title) && length(translations[$locale].title) > 0 => translations[$locale].title,
+          title
+        ),
+        "imageAlt": select(
+          defined(translations[$locale].imageAlt) && length(translations[$locale].imageAlt) > 0 => translations[$locale].imageAlt,
+          defined(previewImage.alt) && length(previewImage.alt) > 0 => previewImage.alt,
+          defined(translations[$locale].title) && length(translations[$locale].title) > 0 => translations[$locale].title,
+          title
+        ),
+        "seoMetaDescription": select(
+          defined(translations[$locale].seoMetaDescription) && length(translations[$locale].seoMetaDescription) > 0 => translations[$locale].seoMetaDescription,
+          defined(seoMetaDescription) && length(seoMetaDescription) > 0 => seoMetaDescription,
+          defined(translations[$locale].shortDescription) && length(translations[$locale].shortDescription) > 0 => translations[$locale].shortDescription,
+          shortDescription
+        ),
+        "shortDescription": select(
+          defined(translations[$locale].shortDescription) && length(translations[$locale].shortDescription) > 0 => translations[$locale].shortDescription,
+          shortDescription
+        ),
+        "fullDescription": select(
+          defined(translations[$locale].fullDescription) && count(translations[$locale].fullDescription) > 0 => translations[$locale].fullDescription,
+          fullDescription
+        ),
         courseType,
         menuOrder,
         sortOrder,
@@ -81,11 +105,21 @@ export default async function Page({ params }: PageProps) {
         levels,
         hoursPerWeek,
         durationWeeks,
-        "schedule": coalesce(translations[$locale].schedule, schedule),
-        "price": coalesce(translations[$locale].price, price),
+        "schedule": select(
+          defined(translations[$locale].schedule) && length(translations[$locale].schedule) > 0 => translations[$locale].schedule,
+          schedule
+        ),
+        "price": select(
+          defined(translations[$locale].price) && length(translations[$locale].price) > 0 => translations[$locale].price,
+          price
+        ),
         isFeatured,
         iconType,
-        "tags": coalesce(translations[$locale].tags, tags),
+        "tags": select(
+          defined(translations[$locale].tags) && count(translations[$locale].tags) > 0 => translations[$locale].tags,
+          defined(tags) && count(tags) > 0 => tags,
+          []
+        ),
         previewImage
       }
     `
